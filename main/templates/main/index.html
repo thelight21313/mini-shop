@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <title>Вход</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#f3f3f3; padding:40px; }
+    .box { max-width: 320px; margin:auto; background:white; padding:20px; border-radius:6px; border:1px solid #ccc; }
+    input { width:95%; padding:10px; margin:8px 0; border:1px solid #bbb; border-radius:4px; }
+    button { width:100%; padding:10px; margin-top:10px; border:0; background:#1976d2; color:white; border-radius:4px; cursor:pointer; }
+    .secondary { background:#eee; color:#333; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>Вход</h2>
+
+    <form method="post", action="{% url 'login' %}">
+      {%csrf_token%}
+      <input type="text" placeholder="Логин" autocomplete="off" name="login">
+      <input type="text" placeholder="Пароль" autocomplete="off" name="password">
+      <button type="submit">Войти</button>
+    </form>
+
+    <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="{% url 'register'%}">Register</a><br>
+    <h5> {{ error }}</h5>
+  </div>
+</body>
+</html>
+

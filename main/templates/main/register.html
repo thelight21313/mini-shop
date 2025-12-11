@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <title>Регистрация</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#f3f3f3; padding:40px; }
+    .box { max-width: 320px; margin:auto; background:white; padding:20px; border-radius:6px; border:1px solid #ccc; }
+    input { width:100%; padding:10px; margin:8px 0; border:1px solid #bbb; border-radius:4px; }
+    button { width:100%; padding:10px; margin-top:10px; border:0; background:#1976d2; color:white; border-radius:4px; cursor:pointer; }
+    .secondary { background:#eee; color:#333; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>Регистрация</h2>
+    <form method="post", action="{% url 'register' %}">
+      {%csrf_token%}
+      <input type="text" placeholder="Имя пользователя" autocomplete="off" name="name" />
+      <input type="password" placeholder="Пароль" autocomplete="off" name="p1" />
+      <input type="password" placeholder="Повторите пароль" autocomplete="off" name="p2" />
+
+      <button type="submit">Создать аккаунт</button>
+
+    </form>
+
+    <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="{% url 'login'%}">Login</a>
+  </div>
+</body>
+</html>
