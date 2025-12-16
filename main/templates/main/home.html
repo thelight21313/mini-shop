@@ -1,11 +1,320 @@
 <!DOCTYPE html>
-<html lang="en">
+{% include "main/header.html" %}
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Магазин</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        .products {
+            padding: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid #e9ecef;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+
+        .card-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .card-content {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #212529;
+            line-height: 1.4;
+        }
+
+        .card-price {
+            font-size: 22px;
+            font-weight: 700;
+            color: #28a745;
+            margin-bottom: 15px;
+        }
+
+        .card-actions {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+
+        .btn-secondary {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #1e7e34;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #6c757d;
+            border: 2px solid #dee2e6;
+        }
+
+        .btn-outline:hover {
+            border-color: #007bff;
+            color: #007bff;
+        }
+
+        .form-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .form-group .btn {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            color: #dee2e6;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #495057;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            justify-content: center;
+        }
+
+        .quantity-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid #dee2e6;
+            background: white;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .quantity-btn:hover {
+            border-color: #007bff;
+            background: #f8f9fa;
+        }
+
+        .quantity-value {
+            font-size: 18px;
+            font-weight: 600;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .in-cart-badge {
+            background: #28a745;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .action-form {
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .products {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                padding: 20px;
+                gap: 20px;
+            }
+
+            .form-group {
+                flex-direction: column;
+            }
+
+            .form-group .btn {
+                min-width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .products {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
+
 <body>
-    <h2>Привет, {{ username }}!</h2>
-    <a href="{% url 'login' %}">Выйти</a>
+    <!-- PRODUCTS -->
+    <div class="products">
+        {% for product in products %}
+        <div class="card">
+            <img src="{{ product.image_url }}" alt="{{ product.title }}" class="card-image">
+
+            <div class="card-content">
+                <div class="card-title">{{ product.title }}</div>
+                <div class="card-price">{{ product.price }} ₽</div>
+
+                <div class="card-actions">
+                    <!-- Одна форма для всех действий -->
+                    <form method="post" class="action-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="product_id" value="{{ product.product_id }}">
+
+                        <div class="form-group">
+                            <!-- Кнопка "Подробнее" -->
+                            <button type="submit" name="action" value="details" class="btn btn-outline">
+                                <i class="fas fa-info-circle"></i> Подробнее
+                            </button>
+
+                            <!-- Кнопка "В корзину" -->
+                            <button type="submit" name="action" value="add_to_cart" class="btn btn-secondary">
+                                <i class="fas fa-shopping-cart"></i> В корзину
+                            </button>
+                        </div>
+
+                        <!-- Кнопка "В избранное" (второй ряд) -->
+                        <button type="submit" name="action" value="add_to_favorites" class="btn btn-outline" style="margin-top: 5px;">
+                            <i class="fas fa-heart"></i> В избранное
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="empty-state">
+            <i class="fas fa-box-open"></i>
+            <h3>Нет товаров</h3>
+            <p>Товары появятся скоро</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        // Анимация появления карточек
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+
+                setTimeout(() => {
+                    card.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+
+        // Обработка нажатий кнопок
+        document.querySelectorAll('.action-form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                const action = document.activeElement.value;
+
+                // Здесь можно добавить предварительную обработку
+                switch(action) {
+                    case 'add_to_cart':
+                        console.log('Добавление в корзину');
+                        break;
+                    case 'add_to_favorites':
+                        console.log('Добавление в избранное');
+                        break;
+                    case 'details':
+                        console.log('Просмотр деталей');
+                        break;
+                }
+            });
+        });
+    </script>
+    <footer>
+    <p>ИНН: 231151169943</p>
+    <!-- остальные ссылки -->
+    </footer>
 </body>
 </html>

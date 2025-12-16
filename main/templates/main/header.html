@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <style>
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            padding-top: 70px
+        }
+
+        /* HEADER */
+        .navbar {
+            background: #222;
+            color: white;
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;       /* прилипает к верху */
+            top: 0;
+            left: 0;
+            width: 100%;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin-right: 20px;
+            font-weight: bold;
+        }
+
+        .navbar a:last-child {
+            margin-right: 0;
+        }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <div>
+        <a href="{%url 'home'%}">Главная</a>
+        <a href="{%url 'about'%}">О нас</a>
+        <a href="{%url 'cart'%}">Корзина</a>
+    </div>
+
+    <div>
+        <span style="margin-right: 20px;">Привет!</span>
+        <a style="margin-right: 20px;" href="{% url 'profile'%}">Профиль</a>
+        <a style="margin-right: 80px;" href="{% url 'exit'%}">Выйти</a>
+    </div>
+  </div>
+</body>
+</html>

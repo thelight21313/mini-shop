@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+{% include "main/header.html" %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Корзина</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f4f4; margin:0; padding:30px; }
+        .container { max-width:1000px; margin:auto; background:white; padding:20px; border-radius:8px; }
+        h2 { text-align:center; margin-bottom:20px; }
+        table { width:100%; border-collapse: collapse; }
+        th, td { padding:12px; border-bottom:1px solid #ddd; text-align:center; }
+        th { background:#f0f0f0; }
+        img { width:70px; height:50px; object-fit:cover; border-radius:4px; }
+        .qty-form { display:flex; justify-content:center; gap:5px; }
+        .qty-form button { padding:5px 10px; cursor:pointer; }
+        .remove-btn { background:#dc3545; color:white; border:none; padding:6px 10px; border-radius:5px; cursor:pointer; }
+        .total { text-align:right; font-size:20px; margin-top:20px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Корзина</h2>
+
+    {% if cart_items %}
+    <table>
+        <thead>
+            <tr>
+                <th>Изображение</th>
+                <th>Название</th>
+                <th>Цена</th>
+                <th>Количество</th>
+                <th>Сумма</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in cart_items %}
+            <tr>
+                <td><img src="{{ item.image_url }}" alt="{{ item.title }}"></td>
+                <td>{{ item.title }}</td>
+                <td>{{ item.price }} ₽</td>
+                <td>
+                    <form method="post" action="{% url 'update_cart' %}" class="qty-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="product_id" value="{{ item.product_id }}">
+                        <button type="submit" name="action" value="minus">−</button>
+                        <span>{{ item.count }}</span>
+                        <button type="submit" name="action" value="plus">+</button>
+                    </form>
+                </td>
+                <td>{{ item.price }} ₽</td>
+                <td>{{ item.count }}</td>
+                <td>{{ item.total_price }} ₽</td>
+                <td>
+                    <form method="post" action="{% url 'remove_from_cart' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="product_id" value="{{ item.product_id }}">
+                        <button class="remove-btn">✕</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="total">
+        Итого: {{ cart_total }} ₽
+    </div>
+
+    {% else %}
+    <p style="text-align:center; padding:20px;">Корзина пуста</p>
+    {% endif %}
+
+</div>
+<footer>
+        <p>ИНН: 231151169943</p>
+        <!-- остальные ссылки -->
+    </footer>
+</body>
+</html>
