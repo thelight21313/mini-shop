@@ -102,9 +102,9 @@ def update_cart(request):
             cart_item.save()
         elif cart_item.count <= 1:
             cart_item.delete()
-            return redirect('home/cart')
+            return redirect('cart')
 
-    return redirect('home/cart')
+    return redirect('cart')
 
 
 @login_required
