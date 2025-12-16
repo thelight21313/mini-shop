@@ -69,7 +69,8 @@ def home(request):
 
 
     products = Product.objects.all()
-    return render(request, "main/home.html", {"products": products})
+    is_seller = request.user.groups.filter(name='seller').exists()
+    return render(request, "main/home.html", {"products": products, "is_seller": is_seller})
 
 
 @login_required
@@ -162,3 +163,29 @@ def oferta(request):
 
 def contacts(request):
     return render(request, 'main/contacts.html')
+
+
+def create_product(request):
+    if request.method == "POST":
+        new_product_id = 0
+        title = request.POST.get("title")
+        price = request.POST.get("price")
+        image_url = request.POST.get("image_url")
+
+        last_product = Product.objects.all(
+        ).order_by('-product_id').first()
+
+        if last_product:
+            new_product_id = last_product.product_id + 1
+        else:
+            new_product_id = 1
+
+        Product.objects.create(
+            title=title,
+            price=price,
+            image_url=image_url,
+            product_id=new_product_id
+        )
+        return redirect('home')
+
+    return render(request, "main/create_product.html")

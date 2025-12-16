@@ -226,6 +226,36 @@
                 grid-template-columns: 1fr;
             }
         }
+        .seller-corner-button {
+        position: fixed;
+        top: 60px;
+        right: 20px;
+        z-index: 1000;
+    }
+
+    .corner-btn {
+        background: linear-gradient(45deg, #FF416C, #FF4B2B);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 14px;
+        box-shadow: 0 4px 12px rgba(255, 65, 108, 0.4);
+        border: none;
+        cursor: pointer;
+        display: inline-block;
+        transition: all 0.2s;
+    }
+
+    .corner-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 16px rgba(255, 65, 108, 0.6);
+    }
+
+    .corner-btn i {
+        margin-right: 8px;
+    }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -274,6 +304,13 @@
             <p>Товары появятся скоро</p>
         </div>
         {% endfor %}
+        {% if is_seller %}
+        <div class="seller-corner-button">
+            <a href="{% url 'create_product' %}" class="corner-btn" title="Создать товар">
+                <i class="fas fa-plus"></i> Создать товар
+            </a>
+        </div>
+        {% endif %}
     </div>
 
     <script>

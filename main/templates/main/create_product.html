@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Создать товар</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .form-container {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            border-color: #667eea;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #666;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-box strong {
+            color: #333;
+        }
+
+        .field-info {
+            font-size: 12px;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .preview {
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .preview img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            border: 2px dashed #ddd;
+            padding: 10px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="form-container">
+        <h2><i class="fas fa-box-open"></i> Создать новый товар</h2>
+
+        <div class="info-box">
+            <p><strong>📝 Product ID будет сгенерирован автоматически!</strong></p>
+            <p>Система найдет максимальный ID и добавит +1</p>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="title"><i class="fas fa-heading"></i> Название товара</label>
+                <input type="text" id="title" name="title" required
+                       placeholder="Например: iPhone 15 Pro Max">
+                <div class="field-info">Максимум 200 символов</div>
+            </div>
+
+            <div class="form-group">
+                <label for="price"><i class="fas fa-tag"></i> Цена (в рублях)</label>
+                <input type="number" id="price" name="price" required
+                       min="1" max="1000000"
+                       placeholder="Например: 99999">
+                <div class="field-info">Только цифры, без пробелов</div>
+            </div>
+
+            <div class="form-group">
+                <label for="image_url"><i class="fas fa-image"></i> Ссылка на изображение</label>
+                <input type="text" id="image_url" name="image_url" required
+                       placeholder="https://example.com/image.jpg">
+                <div class="field-info">Поддерживается JPG, PNG, WebP</div>
+
+                <div class="preview">
+                    <img id="image_preview" src="" alt="Превью" style="display: none;">
+                    <div id="no_preview" style="color: #999; font-size: 13px;">
+                        Превью появится после ввода ссылки
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">
+                <i class="fas fa-plus-circle"></i> Создать товар
+            </button>
+        </form>
+
+        <a href="{% url 'home' %}" class="back-link">
+            <i class="fas fa-arrow-left"></i> Вернуться на главную
+        </a>
+    </div>
+
+    <script>
+        // Превью изображения в реальном времени
+        document.getElementById('image_url').addEventListener('input', function() {
+            const url = this.value.trim();
+            const preview = document.getElementById('image_preview');
+            const noPreview = document.getElementById('no_preview');
+
+            if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+                preview.src = url;
+                preview.style.display = 'block';
+                noPreview.style.display = 'none';
+            } else {
+                preview.style.display = 'none';
+                noPreview.style.display = 'block';
+            }
+        });
+
+        // Автоподстановка https:// если не указан протокол
+        document.getElementById('image_url').addEventListener('blur', function() {
+            let url = this.value.trim();
+            if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
+                this.value = 'https://' + url;
+            }
+        });
+    </script>
+</body>
+</html>
