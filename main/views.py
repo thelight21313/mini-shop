@@ -143,9 +143,9 @@ def remove_from_cart(request):
         product_id = request.POST.get('product_id')
         cart_items = Cart.objects.filter(product_id=product_id)
         cart_items.delete()
-        return redirect('home/cart')
+        return redirect('/cart')
 
-    return redirect('home/cart')
+    return redirect('/cart')
 
 
 def exit(request):
