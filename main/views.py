@@ -88,7 +88,7 @@ def create_payment(request):
     if request.method != "POST":
         return redirect('cart')
     Configuration.account_id = "1231470"
-    Configuration.secret_key = "test_*gTYtsRnpfO4wf7d3m483knmfzPb0OkmFysy5UWPf6YqE"
+    Configuration.secret_key = "test_IUe2Mi_ainNSY1reHVY9Gk6d9gTqGIKKUkEt2Ni8A7U"
 
     username = request.user.username
     cart_items = Cart.objects.filter(user=username)
