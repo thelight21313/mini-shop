@@ -88,7 +88,7 @@
         <div class="total">
             Итого: {{ cart_total }} ₽
         </div>
-        <form method="post" action="{% url 'cart' %}">
+        <form method="post" action="{% url 'create_payment' %}">
             {% csrf_token %}
             <button type="submit" name="checkout" class="checkout-btn">Оформить заказ</button>
         </form>
