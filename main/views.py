@@ -105,7 +105,7 @@ def create_payment(request):
             },
             "confirmation": {
                 "type": "redirect",
-                "return_url": "http://127.0.0.1:8000/home"  # Полный URL
+                "return_url": "158.160.108.224:8000/"  # Полный URL
             },
             "capture": True,
             "description": f"Оплата корзины пользователя {username}"
