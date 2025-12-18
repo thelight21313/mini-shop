@@ -8,7 +8,8 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, logout
 from django import forms
 from django.contrib.auth.decorators import login_required
-
+import uuid
+from yookassa import Configuration, Payment
 
 def index(request):
     if request.method == 'POST':
@@ -73,7 +74,6 @@ def home(request):
     return render(request, "main/home.html", {"products": products, "is_seller": is_seller})
 
 
-@login_required
 def cart(request):
     username = request.user.username
     cart_items = Cart.objects.filter(user=username)
@@ -83,6 +83,24 @@ def cart(request):
 
     context = {"cart_items": cart_items,
                "cart_total": cart_total}
+    if request.method == "POST":
+        shop_id = "1231470"
+        secret_key = "test_*gTYtsRnpfO4wf7d3m483knmfzPb0OkmFysy5UWPf6YqE"
+        Configuration.configure(shop_id, secret_key)
+        idempotence_key = str(uuid.uuid4())
+        payment = Payment.create({
+            "amount": {
+                "value": cart_total,
+                "currency": "RUB"
+            },
+            "confirmation": {
+                "type": "redirect",
+                "return_url": "http://158.160.108.224:8000/home/cart/"
+            },
+            "capture": True,
+            "description": "Заказ №1"
+        }, idempotence_key)
+        return redirect(payment.confirmation.confirmation_url)
     return render(request, "main/cart.html", context)
 
 

@@ -16,6 +16,25 @@
         .qty-form button { padding:5px 10px; cursor:pointer; }
         .remove-btn { background:#dc3545; color:white; border:none; padding:6px 10px; border-radius:5px; cursor:pointer; }
         .total { text-align:right; font-size:20px; margin-top:20px; }
+        .checkout-btn {
+            display: block;
+            margin: 20px auto 0;
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .checkout-btn:hover { background: #218838; }
+        .total-section {
+            text-align: right;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
     </style>
 </head>
 <body>
@@ -65,8 +84,14 @@
         </tbody>
     </table>
 
-    <div class="total">
-        Итого: {{ cart_total }} ₽
+    <div class="total-section">
+        <div class="total">
+            Итого: {{ cart_total }} ₽
+        </div>
+        <form method="post" action="{% url 'cart' %}">
+            {% csrf_token %}
+            <button type="submit" name="checkout" class="checkout-btn">Оформить заказ</button>
+        </form>
     </div>
 
     {% else %}
@@ -75,8 +100,8 @@
 
 </div>
 <footer>
-        <p>ИНН: 231151169943</p>
-        <!-- остальные ссылки -->
-    </footer>
+    <p>ИНН: 231151169943</p>
+    <!-- остальные ссылки -->
+</footer>
 </body>
 </html>
