@@ -26,5 +26,5 @@ urlpatterns = [
     path("order_history/", views.profile, name='order_history'),
     path('oferta/', views.oferta, name='oferta'),
     path('contacts/', views.contacts, name='contacts'),
-    path('create_product/', views.create_product, name='create_product'),
+    path('create_payment/', views.create_payment, name='create_payment'),
 ]
