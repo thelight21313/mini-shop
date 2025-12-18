@@ -8,7 +8,8 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, logout
 from django import forms
 from django.contrib.auth.decorators import login_required
-
+import uuid
+from yookassa import Configuration, Payment
 
 def index(request):
     if request.method == 'POST':
@@ -73,7 +74,6 @@ def home(request):
     return render(request, "main/home.html", {"products": products, "is_seller": is_seller})
 
 
-@login_required
 def cart(request):
     username = request.user.username
     cart_items = Cart.objects.filter(user=username)
@@ -81,10 +81,40 @@ def cart(request):
         item.total_price = item.price * item.count
     cart_total = sum([item.total_price for item in cart_items])
 
-    context = {"cart_items": cart_items,
-               "cart_total": cart_total}
+    context = {"cart_items": cart_items, "cart_total": cart_total}
     return render(request, "main/cart.html", context)
 
+def create_payment(request):
+    if request.method != "POST":
+        return redirect('cart')
+    Configuration.account_id = "1231470"
+    Configuration.secret_key = "test_*gTYtsRnpfO4wf7d3m483knmfzPb0OkmFysy5UWPf6YqE"
+
+    username = request.user.username
+    cart_items = Cart.objects.filter(user=username)
+    cart_total = sum(item.price * item.count for item in cart_items)
+
+    amount_value = str(cart_total)
+
+    idempotence_key = str(uuid.uuid4())
+    try:
+        payment = Payment.create({
+            "amount": {
+                "value": amount_value,
+                "currency": "RUB"
+            },
+            "confirmation": {
+                "type": "redirect",
+                "return_url": "http://127.0.0.1:8000/payment/success/"  # Полный URL
+            },
+            "capture": True,
+            "description": f"Оплата корзины пользователя {username}"
+        }, idempotence_key)
+        return redirect(payment.confirmation.confirmation_url)
+
+    except Exception as e:
+        print(f"Ошибка создания платежа: {e}")
+        return redirect('cart')
 
 @login_required
 def update_cart(request):
