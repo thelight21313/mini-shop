@@ -23,7 +23,7 @@ COPY . .
 
 # Установка Gunicorn (или других WSGI серверов)
 # Предполагается, что у вас есть файл wsgi.py в корне проекта
-CMD ["gunicorn", "your_project.wsgi:application", "--bind", "0.0.0.0:8000"]
+CMD ["gunicorn", "login.wsgi:application", "--bind", "0.0.0.0:8000"]
 
 # Если используете отдельный порт для Gunicorn, например, 8000
 EXPOSE 8000
