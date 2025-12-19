@@ -4,26 +4,27 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
+# Собираем статику в папку /app/staticfiles
 RUN python manage.py collectstatic --noinput
 
 # Stage 2: Финальный образ
 FROM python:3.11-slim
 WORKDIR /app
+
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-# Установка Gunicorn и других зависимостей
-RUN pip install gunicorn
+# Устанавливаем зависимости и Gunicorn ПРЯМО ЗДЕСЬ
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Копируем собранные статические файлы
-COPY --from=builder /app/static /app/static
-
-# Копируем остальное приложение
+# Копируем само приложение
 COPY . .
 
-# Установка Gunicorn (или других WSGI серверов)
-# Предполагается, что у вас есть файл wsgi.py в корне проекта
-CMD ["gunicorn", "login.wsgi:application", "--bind", "0.0.0.0:8000"]
+# Копируем статику из первого этапа (убедитесь, что пути совпадают)
+# В Stage 1 Django соберет их туда, где указано в STATIC_ROOT
+COPY --from=builder /app/staticfiles /app/staticfiles
 
-# Если используете отдельный порт для Gunicorn, например, 8000
 EXPOSE 8000
+
+CMD ["gunicorn", "login.wsgi:application", "--bind", "0.0.0.0:8000"]
