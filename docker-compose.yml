@@ -21,3 +21,6 @@ services:
       - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
       - django_app
+
+volumes:
+  static_static:
