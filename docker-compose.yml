@@ -1,25 +1,25 @@
-version: '3.8'
+version: '3.8' #версия питона
 
 services:
-  django_app:
-    build: .
-    command: gunicorn login.wsgi:application --bind 0.0.0.0:8000
+  django_app: #контейнер джангоо
+    build: . #билдит весь проект в докер
+    command: gunicorn login.wsgi:application --bind 0.0.0.0:8000 #запускает сайт через gunicorn
     volumes:
-      - .:/app
+      - .:/app #это чтоб не ребилдить каждый раз
     expose:
-      - 8000
+      - 8000 #говорит что запускать надо на 8000 порту
 
-  nginx:
-    image: nginx:latest
-    ports:
+  nginx: # контейнер nginx
+    image: nginx:latest #от кого наследовать
+    ports: #проброс портов
       - "80:80"
       - "443:443" # Открываем порт для HTTPS
-    volumes:
+    volumes: #сохраение данных для контейнера
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - static_static:/app/static:ro
       # Пробрасываем сертификаты (только для чтения)
       - /etc/letsencrypt:/etc/letsencrypt:ro
-    depends_on:
+    depends_on: #гарантирует что nginx запуститься после django
       - django_app
 
 volumes:
