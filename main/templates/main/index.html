@@ -1,73 +1,309 @@
-<!doct<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8" />
-  <title>Вход</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Вход | Магазин</title>
   <style>
-    body { font-family: Arial, sans-serif; background:#f3f3f3; padding:40px; }
-    .box { max-width: 320px; margin:auto; background:white; padding:20px; border-radius:6px; border:1px solid #ccc; }
-    input { width:95%; padding:10px; margin:8px 0; border:1px solid #bbb; border-radius:4px; }
-    button { width:100%; padding:10px; margin-top:10px; border:0; background:#1976d2; color:white; border-radius:4px; cursor:pointer; }
-    .secondary { background:#eee; color:#333; }
-    .error { color: #d32f2f; font-size: 14px; margin-top: 5px; }
-    .field-errors { color: #d32f2f; font-size: 13px; margin-bottom: 10px; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      color: #333;
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .container {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    .login-box {
+      background: white;
+      border-radius: 15px;
+      padding: 40px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .login-header h2 {
+      font-size: 1.8rem;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .login-header p {
+      color: #666;
+      font-size: 0.95rem;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #555;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      background: #f8f9fa;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: #667eea;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-control::placeholder {
+      color: #999;
+    }
+
+    .field-errors {
+      color: #dc3545;
+      font-size: 0.85rem;
+      margin-top: 5px;
+      padding-left: 5px;
+    }
+
+    .form-error {
+      background: #f8d7da;
+      color: #721c24;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+      border-left: 4px solid #dc3545;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: #667eea;
+      color: white;
+      margin-bottom: 15px;
+    }
+
+    .btn-primary:hover {
+      background: #5a6fd8;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+    }
+
+    .btn-secondary {
+      background: #f8f9fa;
+      color: #333;
+      border: 2px solid #e0e0e0;
+      text-decoration: none;
+      text-align: center;
+    }
+
+    .btn-secondary:hover {
+      background: #e9ecef;
+      border-color: #667eea;
+    }
+
+    .register-link {
+      text-align: center;
+      margin-top: 25px;
+      color: #666;
+      font-size: 0.9rem;
+    }
+
+    .register-link a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s ease;
+    }
+
+    .register-link a:hover {
+      color: #5a6fd8;
+      text-decoration: underline;
+    }
+
+    footer {
+      background: white;
+      padding: 20px 40px;
+      text-align: center;
+      color: #666;
+      font-size: 0.9rem;
+      border-top: 1px solid #e0e0e0;
+      margin-top: auto;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .footer-content p {
+      margin-bottom: 5px;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .footer-links a {
+      color: #667eea;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .footer-links a:hover {
+      color: #5a6fd8;
+      text-decoration: underline;
+    }
+
+    @media (max-width: 480px) {
+      .login-box {
+        padding: 30px 20px;
+      }
+
+      .container {
+        padding: 20px;
+      }
+
+      footer {
+        padding: 15px 20px;
+      }
+
+      .footer-links {
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
   </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-  <div class="box">
-    <h2>Вход</h2>
+  <div class="container">
+    <div class="login-box">
+      <div class="login-header">
+        <h2>Вход в аккаунт</h2>
+        <p>Введите ваши данные для входа</p>
+      </div>
 
-    <form method="post" action="{% url 'login' %}">
-      {% csrf_token %}
+      <form method="post" action="{% url 'login' %}">
+        {% csrf_token %}
 
-      <!-- Поле username -->
-      <div>
-        <input type="text"
-               placeholder="Логин"
-               autocomplete="off"
-               name="username"
-               value="{{ form.username.value|default_if_none:'' }}">
-        {% if form.username.errors %}
-          <div class="field-errors">
-            {% for error in form.username.errors %}
-              {{ error }}
+        <!-- Общие ошибки формы -->
+        {% if form.non_field_errors %}
+          <div class="form-error">
+            {% for error in form.non_field_errors %}
+              <i class="fas fa-exclamation-circle"></i> {{ error }}
             {% endfor %}
           </div>
         {% endif %}
-      </div>
 
-      <!-- Поле password -->
-      <div>
-        <input type="password"
-               placeholder="Пароль"
-               autocomplete="off"
-               name="password">
-        {% if form.password.errors %}
-          <div class="field-errors">
-            {% for error in form.password.errors %}
-              {{ error }}
-            {% endfor %}
-          </div>
-        {% endif %}
-      </div>
-
-      <!-- Общие ошибки формы (например, неверный логин/пароль) -->
-      {% if form.non_field_errors %}
-        <div class="error">
-          {% for error in form.non_field_errors %}
-            {{ error }}
-          {% endfor %}
+        <!-- Поле username -->
+        <div class="form-group">
+          <label for="username">Логин</label>
+          <input type="text"
+                 id="username"
+                 class="form-control"
+                 placeholder="Введите ваш логин"
+                 autocomplete="off"
+                 name="username"
+                 value="{{ form.username.value|default_if_none:'' }}">
+          {% if form.username.errors %}
+            <div class="field-errors">
+              {% for error in form.username.errors %}
+                <i class="fas fa-exclamation-circle"></i> {{ error }}
+              {% endfor %}
+            </div>
+          {% endif %}
         </div>
-      {% endif %}
 
-      <button type="submit">Войти</button>
-    </form>
+        <!-- Поле password -->
+        <div class="form-group">
+          <label for="password">Пароль</label>
+          <input type="password"
+                 id="password"
+                 class="form-control"
+                 placeholder="Введите ваш пароль"
+                 autocomplete="off"
+                 name="password">
+          {% if form.password.errors %}
+            <div class="field-errors">
+              {% for error in form.password.errors %}
+                <i class="fas fa-exclamation-circle"></i> {{ error }}
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
 
-    <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="{% url 'register' %}">Регистрация</a><br>
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-sign-in-alt"></i>
+          Войти
+        </button>
+      </form>
+
+      <div class="register-link">
+        Еще нет аккаунта?
+        <a href="{% url 'register' %}">Зарегистрироваться</a>
+      </div>
+    </div>
   </div>
+
   <footer>
-        <p>ИНН: 231151169943</p>
-        <!-- остальные ссылки -->
-    </footer>
+    <div class="footer-content">
+      <p>ИНН: 231151169943</p>
+      <div class="footer-links">
+        <a href="{% url 'about' %}">О компании</a>
+        <a href="#">Политика конфиденциальности</a>
+        <a href="#">Условия использования</a>
+        <a href="#">Контакты</a>
+      </div>
+      <p style="margin-top: 10px; color: #888; font-size: 0.8rem;">
+        © 2024 Магазин. Все права защищены.
+      </p>
+    </div>
+  </footer>
 </body>
 </html>
