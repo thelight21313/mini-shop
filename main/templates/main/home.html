@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Магазин</title>
+    <title>Магазин | Каталог товаров</title>
     <style>
         * {
             margin: 0;
@@ -14,97 +14,133 @@
         }
 
         body {
-            background: #f8f9fa;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
-        .products {
-            padding: 30px;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 30px;
+        .main-content {
+            flex: 1;
+            padding: 30px 40px;
             max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .page-header {
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .page-header p {
+            color: #666;
+            font-size: 1.1rem;
+            max-width: 600px;
             margin: 0 auto;
         }
 
-        .card {
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .product-card {
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            border: 1px solid #e9ecef;
+            transition: all 0.3s ease;
+            border: 1px solid #e0e0e0;
+            position: relative;
         }
 
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
         }
 
-        .card-image {
+        .product-image {
             width: 100%;
-            height: 200px;
+            height: 220px;
             object-fit: cover;
-            border-bottom: 1px solid #e9ecef;
+            border-bottom: 1px solid #f0f0f0;
         }
 
-        .card-content {
-            padding: 20px;
+        .product-content {
+            padding: 25px;
             flex: 1;
             display: flex;
             flex-direction: column;
         }
 
-        .card-title {
-            font-size: 18px;
+        .product-title {
+            font-size: 1.2rem;
             font-weight: 600;
-            margin-bottom: 10px;
-            color: #212529;
+            margin-bottom: 12px;
+            color: #2c3e50;
             line-height: 1.4;
         }
 
-        .card-price {
-            font-size: 22px;
+        .product-price {
+            font-size: 1.5rem;
             font-weight: 700;
-            color: #28a745;
-            margin-bottom: 15px;
+            color: #667eea;
+            margin-bottom: 20px;
         }
 
-        .card-actions {
+        .product-actions {
             margin-top: auto;
             display: flex;
             flex-direction: column;
+            gap: 12px;
+        }
+
+        .action-buttons {
+            display: flex;
             gap: 10px;
+            margin-bottom: 10px;
         }
 
         .btn {
-            padding: 12px;
+            padding: 12px 20px;
             border: none;
             border-radius: 8px;
             cursor: pointer;
             font-size: 14px;
             font-weight: 600;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
+            flex: 1;
+            text-decoration: none;
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
 
         .btn-primary {
-            background: #007bff;
+            background: #667eea;
             color: white;
         }
 
         .btn-primary:hover {
-            background: #0056b3;
+            background: #5a6fd8;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
         }
 
         .btn-secondary {
@@ -113,245 +149,334 @@
         }
 
         .btn-secondary:hover {
-            background: #1e7e34;
+            background: #218838;
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.2);
         }
 
         .btn-outline {
             background: transparent;
-            color: #6c757d;
-            border: 2px solid #dee2e6;
+            color: #667eea;
+            border: 2px solid #667eea;
         }
 
         .btn-outline:hover {
-            border-color: #007bff;
-            color: #007bff;
+            background: rgba(102, 126, 234, 0.05);
         }
 
-        .form-group {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .form-group .btn {
-            flex: 1;
-            min-width: 120px;
-        }
-
-        .empty-state {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 60px 20px;
-            color: #6c757d;
-        }
-
-        .empty-state i {
-            font-size: 48px;
-            color: #dee2e6;
-            margin-bottom: 20px;
-        }
-
-        .empty-state h3 {
-            font-size: 24px;
-            margin-bottom: 10px;
-            color: #495057;
-        }
-
-        .quantity-controls {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
-            justify-content: center;
-        }
-
-        .quantity-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border: 2px solid #dee2e6;
-            background: white;
-            font-size: 18px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-        }
-
-        .quantity-btn:hover {
-            border-color: #007bff;
+        .btn-favorite {
             background: #f8f9fa;
+            color: #333;
+            border: 2px solid #dee2e6;
+            width: 100%;
         }
 
-        .quantity-value {
-            font-size: 18px;
-            font-weight: 600;
-            min-width: 40px;
-            text-align: center;
-        }
-
-        .in-cart-badge {
-            background: #28a745;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-            margin-left: 10px;
+        .btn-favorite:hover {
+            border-color: #dc3545;
+            color: #dc3545;
         }
 
         .action-form {
             width: 100%;
         }
 
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            color: #dee2e6;
+            margin-bottom: 25px;
+        }
+
+        .empty-state h3 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: #495057;
+        }
+
+        .empty-state p {
+            color: #6c757d;
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+        }
+
+        .seller-corner {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            z-index: 1000;
+        }
+
+        .seller-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 14px 28px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .seller-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        footer {
+            background: white;
+            padding: 30px 40px;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #e0e0e0;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-content p {
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .footer-links a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #5a6fd8;
+            text-decoration: underline;
+        }
+
+        .copyright {
+            color: #888;
+            font-size: 0.85rem;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 1200px) {
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+        }
+
         @media (max-width: 768px) {
-            .products {
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            .main-content {
                 padding: 20px;
+            }
+
+            .page-header h1 {
+                font-size: 2rem;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
                 gap: 20px;
             }
 
-            .form-group {
+            .action-buttons {
                 flex-direction: column;
             }
 
-            .form-group .btn {
-                min-width: 100%;
+            .seller-corner {
+                bottom: 20px;
+                right: 20px;
+            }
+
+            .seller-btn {
+                padding: 12px 20px;
+                font-size: 14px;
+            }
+
+            footer {
+                padding: 25px 20px;
             }
         }
 
         @media (max-width: 480px) {
-            .products {
+            .products-grid {
                 grid-template-columns: 1fr;
             }
+
+            .page-header h1 {
+                font-size: 1.8rem;
+            }
+
+            .seller-corner {
+                position: relative;
+                bottom: auto;
+                right: auto;
+                margin: 30px auto;
+                text-align: center;
+                justify-content: center;
+            }
+
+            .seller-btn {
+                width: fit-content;
+                margin: 0 auto;
+            }
         }
-        .seller-corner-button {
-        position: fixed;
-        top: 60px;
-        right: 20px;
-        z-index: 1000;
-    }
 
-    .corner-btn {
-        background: linear-gradient(45deg, #FF416C, #FF4B2B);
-        color: white;
-        padding: 10px 20px;
-        border-radius: 25px;
-        text-decoration: none;
-        font-weight: bold;
-        font-size: 14px;
-        box-shadow: 0 4px 12px rgba(255, 65, 108, 0.4);
-        border: none;
-        cursor: pointer;
-        display: inline-block;
-        transition: all 0.2s;
-    }
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
 
-    .corner-btn:hover {
-        transform: scale(1.05);
-        box-shadow: 0 6px 16px rgba(255, 65, 108, 0.6);
-    }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-    .corner-btn i {
-        margin-right: 8px;
-    }
+        .stagger-delay {
+            animation-delay: calc(var(--order) * 0.1s);
+        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-
 <body>
-    <!-- PRODUCTS -->
-    <div class="products">
-        {% for product in products %}
-        <div class="card">
-            <img src="{{ product.image_url }}" alt="{{ product.title }}" class="card-image">
+    <div class="main-content">
+        <div class="page-header">
+            <h1>Наши товары</h1>
+            <p>Лучшие предложения для вас. Выбирайте и покупайте с удовольствием!</p>
+        </div>
 
-            <div class="card-content">
-                <div class="card-title">{{ product.title }}</div>
-                <div class="card-price">{{ product.price }} ₽</div>
+        <div class="products-grid">
+            {% for product in products %}
+            <div class="product-card fade-in" style="--order: {{ forloop.counter0 }}; animation-delay: calc({{ forloop.counter0 }} * 0.1s);">
+                <img src="{{ product.image_url }}" alt="{{ product.title }}" class="product-image">
 
-                <div class="card-actions">
-                    <!-- Одна форма для всех действий -->
-                    <form method="post" class="action-form">
-                        {% csrf_token %}
-                        <input type="hidden" name="product_id" value="{{ product.product_id }}">
+                <div class="product-content">
+                    <h3 class="product-title">{{ product.title }}</h3>
+                    <div class="product-price">{{ product.price }} ₽</div>
 
-                        <div class="form-group">
-                            <!-- Кнопка "Подробнее" -->
-                            <button type="submit" name="action" value="details" class="btn btn-outline">
-                                <i class="fas fa-info-circle"></i> Подробнее
+                    <div class="product-actions">
+                        <form method="post" class="action-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="product_id" value="{{ product.product_id }}">
+
+                            <div class="action-buttons">
+                                <button type="submit" name="action" value="details" class="btn btn-outline">
+                                    <i class="fas fa-info-circle"></i> Подробнее
+                                </button>
+
+                                <button type="submit" name="action" value="add_to_cart" class="btn btn-secondary">
+                                    <i class="fas fa-shopping-cart"></i> В корзину
+                                </button>
+                            </div>
+
+                            <button type="submit" name="action" value="add_to_favorites" class="btn btn-favorite">
+                                <i class="fas fa-heart"></i> В избранное
                             </button>
-
-                            <!-- Кнопка "В корзину" -->
-                            <button type="submit" name="action" value="add_to_cart" class="btn btn-secondary">
-                                <i class="fas fa-shopping-cart"></i> В корзину
-                            </button>
-                        </div>
-
-                        <!-- Кнопка "В избранное" (второй ряд) -->
-                        <button type="submit" name="action" value="add_to_favorites" class="btn btn-outline" style="margin-top: 5px;">
-                            <i class="fas fa-heart"></i> В избранное
-                        </button>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
+            {% empty %}
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-box-open"></i>
+                </div>
+                <h3>Товары не найдены</h3>
+                <p>Здесь скоро появятся новые предложения</p>
+                {% if is_seller %}
+                <a href="{% url 'create_product' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Добавить первый товар
+                </a>
+                {% endif %}
+            </div>
+            {% endfor %}
         </div>
-        {% empty %}
-        <div class="empty-state">
-            <i class="fas fa-box-open"></i>
-            <h3>Нет товаров</h3>
-            <p>Товары появятся скоро</p>
-        </div>
-        {% endfor %}
-        {% if is_seller %}
-        <div class="seller-corner-button">
-            <a href="{% url 'create_product' %}" class="corner-btn" title="Создать товар">
-                <i class="fas fa-plus"></i> Создать товар
+
+        {% if is_seller and products %}
+        <div class="seller-corner">
+            <a href="{% url 'create_product' %}" class="seller-btn">
+                <i class="fas fa-plus-circle"></i> Создать товар
             </a>
         </div>
         {% endif %}
     </div>
 
-    <script>
-        // Анимация появления карточек
-        document.addEventListener('DOMContentLoaded', function() {
-            const cards = document.querySelectorAll('.card');
-            cards.forEach((card, index) => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(20px)';
+    <footer>
+        <div class="footer-content">
+            <p>ИНН: 231151169943</p>
+            <div class="footer-links">
+                <a href="{% url 'about' %}"><i class="fas fa-info-circle"></i> О компании</a>
+                <a href="#"><i class="fas fa-shield-alt"></i> Политика конфиденциальности</a>
+                <a href="#"><i class="fas fa-file-contract"></i> Условия использования</a>
+                <a href="#"><i class="fas fa-envelope"></i> Контакты</a>
+                <a href="#"><i class="fas fa-question-circle"></i> Помощь</a>
+            </div>
+            <div class="copyright">
+                © 2024 Магазин. Все права защищены.
+            </div>
+        </div>
+    </footer>
 
-                setTimeout(() => {
-                    card.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
-                    card.style.opacity = '1';
-                    card.style.transform = 'translateY(0)';
-                }, index * 100);
+    <script>
+        // Анимация загрузки карточек
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.product-card');
+            cards.forEach(card => {
+                card.classList.add('fade-in');
             });
         });
 
-        // Обработка нажатий кнопок
+        // Обработка форм с подтверждением
         document.querySelectorAll('.action-form').forEach(form => {
             form.addEventListener('submit', function(e) {
-                const action = document.activeElement.value;
+                const submitter = e.submitter;
+                const action = submitter ? submitter.value : '';
 
-                // Здесь можно добавить предварительную обработку
-                switch(action) {
-                    case 'add_to_cart':
-                        console.log('Добавление в корзину');
-                        break;
-                    case 'add_to_favorites':
-                        console.log('Добавление в избранное');
-                        break;
-                    case 'details':
-                        console.log('Просмотр деталей');
-                        break;
+                // Можно добавить подтверждения для действий
+                if (action === 'add_to_cart') {
+                    console.log('Добавление товара в корзину...');
+                    // Здесь можно добавить уведомление
+                }
+            });
+        });
+
+        // Плавный скролл
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
                 }
             });
         });
     </script>
-    <footer>
-    <p>ИНН: 231151169943</p>
-    <!-- остальные ссылки -->
-    </footer>
 </body>
 </html>
