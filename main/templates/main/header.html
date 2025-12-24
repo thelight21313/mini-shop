@@ -2,16 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Online Store</title>
+  <title>Магазин</title>
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
       min-height: 100vh;
       padding-top: 80px;
@@ -19,8 +19,7 @@
 
     /* HEADER */
     .navbar {
-      background: linear-gradient(90deg, #2c3e50 0%, #4a6491 100%);
-      color: white;
+      background: white;
       padding: 0 40px;
       display: flex;
       justify-content: space-between;
@@ -30,7 +29,7 @@
       left: 0;
       width: 100%;
       height: 80px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
       z-index: 1000;
     }
 
@@ -41,12 +40,11 @@
     }
 
     .nav-links a {
-      color: white;
+      color: #333;
       text-decoration: none;
       font-weight: 500;
       font-size: 16px;
       padding: 10px 0;
-      position: relative;
       transition: all 0.3s ease;
       display: flex;
       align-items: center;
@@ -54,27 +52,7 @@
     }
 
     .nav-links a:hover {
-      color: #64b3f4;
-      transform: translateY(-2px);
-    }
-
-    .nav-links a::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 0;
-      height: 2px;
-      background: #64b3f4;
-      transition: width 0.3s ease;
-    }
-
-    .nav-links a:hover::after {
-      width: 100%;
-    }
-
-    .nav-links a i {
-      font-size: 18px;
+      color: #667eea;
     }
 
     .user-section {
@@ -85,59 +63,47 @@
 
     .welcome-text {
       font-size: 15px;
-      color: #e0e0e0;
+      color: #666;
       font-weight: 400;
     }
 
-    .profile-link {
-      background: rgba(255, 255, 255, 0.1);
-      padding: 8px 20px;
-      border-radius: 20px;
+    .profile-link, .logout-link {
+      padding: 10px 25px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
       transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .profile-link {
+      background: #667eea;
+      color: white;
     }
 
     .profile-link:hover {
-      background: rgba(255, 255, 255, 0.2);
+      background: #5a6fd8;
       transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
     }
 
     .logout-link {
-      color: #ff6b6b;
-      background: rgba(255, 107, 107, 0.1);
-      padding: 8px 20px;
-      border-radius: 20px;
-      transition: all 0.3s ease;
+      background: #f8f9fa;
+      color: #333;
+      border: 2px solid #ddd;
     }
 
     .logout-link:hover {
-      background: rgba(255, 107, 107, 0.2);
+      background: #e9ecef;
+      border-color: #667eea;
       transform: translateY(-2px);
     }
 
-    /* Иконки псевдоэлементами (если нет FontAwesome) */
-    .nav-links a[href*="home"]::before {
-      content: "🏠";
-      margin-right: 8px;
-    }
-
-    .nav-links a[href*="about"]::before {
-      content: "ℹ️";
-      margin-right: 8px;
-    }
-
-    .nav-links a[href*="cart"]::before {
-      content: "🛒";
-      margin-right: 8px;
-    }
-
-    .profile-link::before {
-      content: "👤";
-      margin-right: 8px;
-    }
-
-    .logout-link::before {
-      content: "🚪";
-      margin-right: 8px;
+    /* Иконки FontAwesome */
+    .fas, .far {
+      font-size: 16px;
     }
 
     /* Адаптивность */
@@ -159,23 +125,43 @@
       .welcome-text {
         font-size: 14px;
       }
+
+      .profile-link, .logout-link {
+        padding: 8px 15px;
+        font-size: 14px;
+      }
     }
   </style>
-  <!-- Для иконок можно подключить FontAwesome (опционально) -->
-  <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"> -->
+  <!-- Подключаем FontAwesome для иконок -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
   <nav class="navbar">
     <div class="nav-links">
-      <a href="{%url 'home'%}">Главная</a>
-      <a href="{%url 'about'%}">О нас</a>
-      <a href="{%url 'cart'%}">Корзина</a>
+      <a href="{%url 'home'%}">
+        <i class="fas fa-home"></i>
+        Главная
+      </a>
+      <a href="{%url 'about'%}">
+        <i class="fas fa-info-circle"></i>
+        О нас
+      </a>
+      <a href="{%url 'cart'%}">
+        <i class="fas fa-shopping-cart"></i>
+        Корзина
+      </a>
     </div>
 
     <div class="user-section">
       <span class="welcome-text">Привет!</span>
-      <a class="profile-link" href="{% url 'profile'%}">Профиль</a>
-      <a class="logout-link" href="{% url 'exit'%}">Выйти</a>
+      <a class="profile-link" href="{% url 'profile'%}">
+        <i class="fas fa-user"></i>
+        Профиль
+      </a>
+      <a class="logout-link" href="{% url 'exit'%}">
+        <i class="fas fa-sign-out-alt"></i>
+        Выйти
+      </a>
     </div>
   </nav>
 </body>
