@@ -87,7 +87,7 @@ class CartAPIView(APIView):
         profuct_id = request.data.get('product_id')
         action = request.data.get('action')
 
-        cart_item = Cart.objects.get(profuct_id=profuct_id, user=username)
+        cart_item = Cart.objects.get(product_id=profuct_id, user=username)
 
         if action == 'plus':
             cart_item.count += 1
