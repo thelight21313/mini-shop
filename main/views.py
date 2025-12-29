@@ -119,10 +119,11 @@ def cart(request):
     for item in cart_items:
         item.total_price = item.price * item.count
     cart_total = sum([item.total_price for item in cart_items])
-
-    return {"cart_items": cart_items,
-            "cart_total": cart_total}
-
+    context = {
+        "cart_items": cart_items,
+        "cart_total": cart_total
+    }
+    return render(request, "main/cart.html", context)
 
 def create_payment(request):
     if request.method != "POST":
