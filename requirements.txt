@@ -20,3 +20,4 @@ typing_extensions==4.15.0
 urllib3==2.6.2
 wrapt==2.0.1
 yookassa==3.9.0
+djangorestframework
