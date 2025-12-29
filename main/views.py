@@ -157,36 +157,6 @@ def create_payment(request):
         return redirect('cart')
 
 
-def update_cart(request):
-    username = request.user.username
-    action = request.POST.get('action')
-    product_id = request.POST.get('product_id')
-    cart_item = Cart.objects.get(product_id=product_id, user=username)
-
-    if action == 'plus':
-        cart_item.count += 1
-        cart_item.save()
-    if action == 'minus':
-        if cart_item.count > 1:
-            cart_item.count -= 1
-            cart_item.save()
-        elif cart_item.count <= 1:
-            cart_item.delete()
-            return redirect('cart')
-
-    return redirect('cart')
-
-
-def remove_from_cart(request):
-    if request.method == "POST":
-        product_id = request.POST.get('product_id')
-        cart_items = Cart.objects.filter(product_id=product_id)
-        cart_items.delete()
-        return redirect('cart')
-
-    return redirect('/cart')
-
-
 def exit(request):
     logout(request)
     return redirect('login')
