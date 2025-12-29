@@ -11,7 +11,7 @@ from .models import Cart
 class CounterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cart
-        fields = ['user', 'title', 'price', 'image_url', 'count', 'product_id']
+        fields = ['user', 'title', 'price', 'image_url', 'count', 'product_id', 'item_total']
 
     def get_item_total(self, obj):
         return obj.price * obj.count
