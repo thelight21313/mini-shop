@@ -1,126 +1,148 @@
-<!DOCTYPE html>
 {% include "main/header.html" %}
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Корзина</title>
-    <style>
-        body { font-family: Arial, sans-serif; background: #f4f4f4; margin:0; padding: 0; }
 
-        /* ЭТОТ БЛОК ОТВЕЧАЕТ ЗА ОТСТУП ОТ ШАПКИ */
-        .cart-wrapper {
-            margin-top: 300px; /* Расстояние от верхнего края (шапки) */
-            padding-bottom: 50px;
-        }
-        .container { max-width:1000px; margin:auto; background:white; padding:20px; border-radius:8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        h2 { text-align:center; margin-bottom:20px; }
-        table { width:100%; border-collapse: collapse; }
-        th, td { padding:12px; border-bottom:1px solid #ddd; text-align:center; }
-        th { background:#f0f0f0; }
-        img { width:70px; height:50px; object-fit:cover; border-radius:4px; }
-        .qty-control { display:flex; justify-content:center; align-items:center; gap:10px; }
-        .qty-control button {
-            padding: 5px 12px;
-            cursor: pointer;
-            border: 1px solid #ccc;
-            background: #fff;
-            border-radius: 4px;
-        }
-        .qty-control button:hover { background: #f0f0f0; }
-        .remove-btn { background:#dc3545; color:white; border:none; padding:6px 12px; border-radius:5px; cursor:pointer; font-weight: bold; }
-        .remove-btn:hover { background:#c82333; }
-        .total-section {
-            text-align: right;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid #ddd;
-        }
-        .total { font-size:22px; font-weight: bold; color: #333; }
-        .checkout-btn {
-            display: inline-block;
-            margin-top: 15px;
-            background: #28a745;
-            color: white;
-            border: none;
-            padding: 12px 40px;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        .checkout-btn:hover { background: #218838; }
-        .empty-msg { text-align:center; padding:40px; color: #666; }
-    </style>
-</head>
-<body>
-{% csrf_token %}
-<div class="container" id="cart-container">
-    <h2>Корзина</h2>
+<style>
+    /* Убираем лишние отступы, которые могли остаться */
+    body {
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    }
 
-    {% if cart_items %}
-    <table>
-        <thead>
-            <tr>
-                <th>Изображение</th>
-                <th>Название</th>
-                <th>Цена</th>
-                <th>Количество</th>
-                <th>Сумма</th>
-                <th>Удалить</th>
-            </tr>
-        </thead>
-        <tbody id="cart-body">
-            {% for item in cart_items %}
-            <tr id="row-{{ item.product_id }}">
-                <td><img src="{{ item.image_url }}" alt="{{ item.title }}"></td>
-                <td>{{ item.title }}</td>
-                <td>{{ item.price }} ₽</td>
-                <td>
-                    <div class="qty-control">
-                        <button onclick="editCart('{{ item.product_id }}', 'minus')">−</button>
-                        <span id="count-{{ item.product_id }}">{{ item.count }}</span>
-                        <button onclick="editCart('{{ item.product_id }}', 'plus')">+</button>
-                    </div>
-                </td>
-                <td id="total-item-{{ item.product_id }}">{{ item.total_price }} ₽</td>
-                <td>
-                    <button class="remove-btn" onclick="editCart('{{ item.product_id }}', 'remove')">✕</button>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    /* Главный контейнер корзины с отступом сверху, чтобы шапка его не закрывала */
+    .cart-section {
+        padding: 40px 20px;
+        margin-top: 20px; /* Дополнительный зазор к тем 80px, что уже есть в шапке */
+        display: flex;
+        justify-content: center;
+    }
 
-    <div class="total-section">
-        <div class="total" id="cart-total-display">
-            Итого: {{ cart_total }} ₽
+    .container {
+        max-width: 1000px;
+        width: 100%;
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 { text-align: center; margin-bottom: 30px; color: #333; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 15px; border-bottom: 1px solid #eee; text-align: center; }
+    th { background: #f8f9fa; color: #666; text-transform: uppercase; font-size: 13px; }
+
+    img { width: 80px; height: 60px; object-fit: cover; border-radius: 6px; }
+
+    .qty-control { display: flex; justify-content: center; align-items: center; gap: 12px; }
+    .qty-control button {
+        width: 30px;
+        height: 30px;
+        cursor: pointer;
+        border: 1px solid #ddd;
+        background: white;
+        border-radius: 6px;
+        transition: all 0.2s;
+    }
+    .qty-control button:hover { background: #667eea; color: white; border-color: #667eea; }
+
+    .remove-btn {
+        background: #ff4d4d; color: white; border: none;
+        width: 35px; height: 35px; border-radius: 8px;
+        cursor: pointer; transition: 0.3s;
+    }
+    .remove-btn:hover { background: #cc0000; transform: scale(1.1); }
+
+    .total-section {
+        text-align: right;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 2px solid #f4f4f4;
+    }
+    .total { font-size: 24px; font-weight: bold; color: #333; margin-bottom: 15px; }
+
+    .checkout-btn {
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 15px 40px;
+        font-size: 18px;
+        font-weight: bold;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    .checkout-btn:hover { background: #218838; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3); }
+
+    .empty-msg { text-align: center; padding: 50px; color: #888; font-size: 18px; }
+</style>
+
+<main class="cart-section">
+    {% csrf_token %}
+    <div class="container" id="cart-container">
+        <h2><i class="fas fa-shopping-basket"></i> Ваша корзина</h2>
+
+        {% if cart_items %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Товар</th>
+                    <th>Название</th>
+                    <th>Цена</th>
+                    <th>Кол-во</th>
+                    <th>Сумма</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="cart-body">
+                {% for item in cart_items %}
+                <tr id="row-{{ item.product_id }}">
+                    <td><img src="{{ item.image_url }}" alt="{{ item.title }}"></td>
+                    <td style="font-weight: 500;">{{ item.title }}</td>
+                    <td>{{ item.price }} ₽</td>
+                    <td>
+                        <div class="qty-control">
+                            <button onclick="editCart('{{ item.product_id }}', 'minus')"><i class="fas fa-minus"></i></button>
+                            <span id="count-{{ item.product_id }}" style="font-weight: bold; min-width: 20px;">{{ item.count }}</span>
+                            <button onclick="editCart('{{ item.product_id }}', 'plus')"><i class="fas fa-plus"></i></button>
+                        </div>
+                    </td>
+                    <td id="total-item-{{ item.product_id }}" style="font-weight: bold;">{{ item.item_total }} ₽</td>
+                    <td>
+                        <button class="remove-btn" onclick="editCart('{{ item.product_id }}', 'remove')">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="total-section">
+            <div class="total" id="cart-total-display">
+                Итого: {{ cart_total }} ₽
+            </div>
+            <form method="post" action="{% url 'create_payment' %}">
+                {% csrf_token %}
+                <button type="submit" class="checkout-btn">
+                    <i class="fas fa-credit-card"></i> Оформить заказ
+                </button>
+            </form>
         </div>
-        <!-- Кнопка оплаты остается обычной формой, так как она редиректит на внешний сервис -->
-        <form method="post" action="{% url 'create_payment' %}">
-            {% csrf_token %}
-            <button type="submit" class="checkout-btn">Оформить заказ</button>
-        </form>
+        {% else %}
+        <div class="empty-msg">
+            <i class="fas fa-shopping-cart fa-3x" style="margin-bottom: 20px; display: block; color: #ddd;"></i>
+            Корзина пуста
+        </div>
+        {% endif %}
     </div>
+</main>
 
-    {% else %}
-    <div class="empty-msg">Корзина пуста</div>
-    {% endif %}
-</div>
-
-<footer>
-    <p style="text-align: center; color: #888; margin-top: 20px;">ИНН: 231151169943</p>
+<footer style="text-align: center; padding: 20px; color: #666;">
+    <p>ИНН: 231151169943</p>
 </footer>
 
 <script>
-    /**
-     * Основная функция для работы с корзиной через DRF
-     * @param {string} productId - ID товара
-     * @param {string} action - 'plus', 'minus' или 'remove'
-     */
     async function editCart(productId, action) {
-        const url = '/api/cart/'; // Убедитесь, что этот URL совпадает с вашим в urls.py
-
+        const url = '/api/cart/';
         try {
             const response = await fetch(url, {
                 method: 'POST',
@@ -128,49 +150,37 @@
                     'Content-Type': 'application/json',
                     'X-CSRFToken': getCookie('csrftoken')
                 },
-                body: JSON.stringify({
-                    product_id: productId,
-                    action: action
-                })
+                body: JSON.stringify({ product_id: productId, action: action })
             });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                alert('Ошибка: ' + (errorData.error || 'Не удалось обновить корзину'));
-                return;
-            }
-
+            if (!response.ok) return;
             const data = await response.json();
 
-            // 1. Если товар должен быть удален из списка
             if (action === 'remove' || data.count === 0) {
                 const row = document.getElementById(`row-${productId}`);
                 if (row) row.remove();
             } else {
                 const countElem = document.getElementById(`count-${productId}`);
-                if (countElem) countElem.innerText = data.count; // <--- ТУТ ТЕПЕРЬ ПРОСТО .count
-
                 const totalElem = document.getElementById(`total-item-${productId}`);
+                if (countElem) countElem.innerText = data.count;
                 if (totalElem) totalElem.innerText = data.item_total + ' ₽';
             }
 
-            // 3. Обновляем общую сумму корзины
             document.getElementById('cart-total-display').innerText = `Итого: ${data.cart_total} ₽`;
 
-            // 4. Если товаров больше нет — показываем сообщение о пустой корзине
             if (data.items_count === 0) {
-                document.getElementById('cart-container').innerHTML = '<h2>Корзина</h2><div class="empty-msg">Корзина пуста</div>';
+                document.getElementById('cart-container').innerHTML = `
+                    <h2><i class="fas fa-shopping-basket"></i> Ваша корзина</h2>
+                    <div class="empty-msg">
+                        <i class="fas fa-shopping-cart fa-3x" style="margin-bottom: 20px; display: block; color: #ddd;"></i>
+                        Корзина пуста
+                    </div>`;
             }
-
         } catch (error) {
-            console.error('Ошибка сети:', error);
-            alert('Произошла ошибка при соединении с сервером');
+            console.error('Ошибка:', error);
         }
     }
 
-    /**
-     * Стандартная функция получения CSRF-токена из куки
-     */
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
@@ -186,7 +196,3 @@
         return cookieValue;
     }
 </script>
-
-</body>
-</html>
-
