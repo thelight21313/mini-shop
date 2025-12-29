@@ -10,6 +10,12 @@ from django import forms
 from django.contrib.auth.decorators import login_required
 import uuid
 from yookassa import Configuration, Payment
+from rest_framework import viewsets
+from rest_framework.response import Response
+from rest_framework import status
+from .serializers import CounterSerializer
+from rest_framework.views import APIView
+
 
 def index(request):
     if request.method == 'POST':
@@ -74,6 +80,39 @@ def home(request):
     return render(request, "main/home.html", {"products": products, "is_seller": is_seller})
 
 
+
+class CartAPIView(APIView):
+    def post(self, request):
+        username = request.user.username
+        profuct_id = request.data.get('product_id')
+        action = request.data.get('action')
+
+        cart_item = Cart.objects.get(profuct_id=profuct_id, user=username)
+
+        if action == 'plus':
+            cart_item.count += 1
+            cart_item.save()
+        elif action == 'minus':
+            if cart_item > 1:
+                cart_item.count -= 1
+                cart_item.save()
+            else:
+                cart_item.delete()
+        elif action == 'remove':
+            cart_item.delete()
+        cart_items = Cart.objects.filter(user=username)
+        for item in cart_items:
+            item.total_price = item.price * item.count
+        cart_total = sum([item.total_price for item in cart_items])
+        if cart_item.pk:
+            seriliztor = CounterSerializer(cart_item)
+            response_data = seriliztor.data
+        else:
+            response_data = {'product_id': profuct_id, 'count': 0}
+        response_data['cart_total'] = cart_total
+        response_data['items_count'] = cart_items.count()
+        return Response(response_data, status=status.HTTP_200_OK)
+
 def cart(request):
     username = request.user.username
     cart_items = Cart.objects.filter(user=username)
@@ -81,8 +120,9 @@ def cart(request):
         item.total_price = item.price * item.count
     cart_total = sum([item.total_price for item in cart_items])
 
-    context = {"cart_items": cart_items, "cart_total": cart_total}
-    return render(request, "main/cart.html", context)
+    return {"cart_items": cart_items,
+            "cart_total": cart_total}
+
 
 def create_payment(request):
     if request.method != "POST":
@@ -116,7 +156,7 @@ def create_payment(request):
         print(f"Ошибка создания платежа: {e}")
         return redirect('cart')
 
-@login_required
+
 def update_cart(request):
     username = request.user.username
     action = request.POST.get('action')
@@ -137,7 +177,6 @@ def update_cart(request):
     return redirect('cart')
 
 
-@login_required
 def remove_from_cart(request):
     if request.method == "POST":
         product_id = request.POST.get('product_id')

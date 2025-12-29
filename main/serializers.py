@@ -1,0 +1,17 @@
+import django
+from django.conf import settings
+from datetime import datetime
+from pathlib import Path
+from rest_framework import serializers
+from rest_framework.renderers import JSONRenderer
+from .models import Cart
+
+
+
+class CounterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Cart
+        fields = ['user', 'title', 'price', 'image_url', 'count', 'product_id']
+
+    def get_item_total(self, obj):
+        return obj.price * obj.count

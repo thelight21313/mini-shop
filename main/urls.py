@@ -1,11 +1,13 @@
 from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
+from .views import CartAPIView
 
 urlpatterns = [
     path('register/', views.register, name='register'),
     path('', views.home, name='home'),
     path('home/cart/', views.cart, name='cart'),
+    path('api/cart/', views.CartAPIView.as_view(), name='cart_api'),
     path('update_cart/', views.update_cart, name='update_cart'),
     path('remove_from_cart/', views.remove_from_cart, name='remove_from_cart'),
     path('exit/', views.exit, name='exit'),
@@ -18,11 +20,7 @@ urlpatterns = [
              redirect_authenticated_user=True  # если уже вошел - на главную
          ),
          name='login'),
-
-    # 👇 Стандартный логаут
-    path('logout/',
-         views.exit,  # или можно свой
-         name='logout'),
+    path('logout/', views.exit, name='logout'),
     path("order_history/", views.profile, name='order_history'),
     path('oferta/', views.oferta, name='oferta'),
     path('contacts/', views.contacts, name='contacts'),
