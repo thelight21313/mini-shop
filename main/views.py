@@ -87,7 +87,7 @@ class CartAPIView(APIView):
         profuct_id = request.data.get('product_id')
         action = request.data.get('action')
 
-        cart_item = Cart.objects.get(product_id=product_id, user=username)
+        cart_item = Cart.objects.get(product_id=profuct_id, user=username)
 
         if action == 'plus':
             cart_item.count += 1
@@ -108,7 +108,7 @@ class CartAPIView(APIView):
             seriliztor = CounterSerializer(cart_item)
             response_data = seriliztor.data
         else:
-            response_data = {'product_id': profuct_id, 'count': 0, 'item_total': 0}
+            response_data = {'product_id': profuct_id, 'count': 0}
         response_data['cart_total'] = cart_total
         response_data['items_count'] = cart_items.count()
         return Response(response_data, status=status.HTTP_200_OK)
