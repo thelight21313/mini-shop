@@ -136,16 +136,15 @@
             const data = await response.json();
 
             // 1. Если товар должен быть удален из списка
-            if (action === 'remove' || data.current_count === 0) {
+            if (action === 'remove' || data.count === 0) {
                 const row = document.getElementById(`row-${productId}`);
                 if (row) row.remove();
             } else {
-                // 2. Иначе обновляем данные в строке
                 const countElem = document.getElementById(`count-${productId}`);
-                const itemTotalElem = document.getElementById(`total-item-${productId}`);
+                if (countElem) countElem.innerText = data.count; // <--- ТУТ ТЕПЕРЬ ПРОСТО .count
 
-                if (countElem) countElem.innerText = data.current_count;
-                if (itemTotalElem) itemTotalElem.innerText = data.item_total + ' ₽';
+                const totalElem = document.getElementById(`total-item-${productId}`);
+                if (totalElem) totalElem.innerText = data.item_total + ' ₽';
             }
 
             // 3. Обновляем общую сумму корзины
