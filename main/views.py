@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.hashers import check_password
-from .models import Account, Product, Cart
+from .models import Account, Product, Cart, Wishlist
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 from datetime import date
@@ -65,13 +65,17 @@ def home(request):
         elif action=="add_to_favorites":
             _id = request.POST.get('product_id')
             info = Product.objects.get(product_id=int(_id))
-            if info.wishlist:
-                info.wishlist = False
-                info.save()
-            elif not info.wishlist:
-                info.wishlist = True
-                info.save()
-
+            wish = Wishlist.objects.filter(product_id=_id, username=username)
+            if not wish.exists():
+                new_wish= Wishlist.objects.create(
+                    title=info.title,
+                    price=info.price,
+                    image_url=info.image_url,
+                    product_id=info.product_id,
+                    username=username
+                )
+            elif wish.exists():
+                wish.delete()
 
     products = Product.objects.all()
     is_seller = request.user.groups.filter(name='seller').exists()
