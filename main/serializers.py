@@ -4,8 +4,7 @@ from datetime import datetime
 from pathlib import Path
 from rest_framework import serializers
 from rest_framework.renderers import JSONRenderer
-from .models import Cart
-
+from .models import Cart, Product
 
 
 class CounterSerializer(serializers.ModelSerializer):
@@ -15,3 +14,9 @@ class CounterSerializer(serializers.ModelSerializer):
 
     def get_item_total(self, obj):
         return obj.price * obj.count
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['title', 'price', 'image_url', 'product_id', 'wishlist']

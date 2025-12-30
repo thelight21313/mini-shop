@@ -42,6 +42,10 @@ def register(request):
     return render(request, 'main/register.html', {'form': form})
 
 
+class homeAPIView(APIView):
+    pass
+
+
 def home(request):
     username = request.user.username
     if request.method == "POST":
@@ -80,7 +84,6 @@ def home(request):
     products = Product.objects.all()
     is_seller = request.user.groups.filter(name='seller').exists()
     return render(request, "main/home.html", {"products": products, "is_seller": is_seller})
-
 
 
 class CartAPIView(APIView):
