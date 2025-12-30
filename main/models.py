@@ -16,6 +16,7 @@ class Product(models.Model):
     price = models.IntegerField()
     image_url = models.CharField(max_length=500)
     product_id = models.IntegerField(null=True, blank=True)
+    wishlist = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title
