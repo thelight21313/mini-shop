@@ -90,10 +90,14 @@ class homeAPIView(APIView):
 
 
 def home(request):
+    message = ''
+    username = request.user.username
+    cart_count = Cart.objects.filter(user=username).count()
     products = Product.objects.all()
     is_seller = request.user.groups.filter(name='seller').exists()
 
     return render(request, "main/home.html", {
+        ''
         "products": products,
         "is_seller": is_seller
     })
