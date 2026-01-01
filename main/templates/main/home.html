@@ -421,7 +421,7 @@
 
                     <div class="product-actions">
                         <!-- Кнопка "Подробнее" остается формой (ведет на другую страницу) -->
-                        <form method="post" action="{% url 'product_detail' product.id %}" style="width: 100%;">
+                        <form method="post" action="{% url 'product_detail' product.product_id %}" style="width: 100%;">
                             {% csrf_token %}
                             <input type="hidden" name="product_id" value="{{ product.product_id }}">
 
