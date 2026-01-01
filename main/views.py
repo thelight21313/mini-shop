@@ -248,6 +248,7 @@ def create_product(request):
         title = request.POST.get("title")
         price = request.POST.get("price")
         image_url = request.POST.get("image_url")
+        description = request.POST.get("description")
 
         last_product = Product.objects.all(
         ).order_by('-product_id').first()
