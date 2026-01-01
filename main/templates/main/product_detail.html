@@ -1,5 +1,5 @@
-{% include "main/header.html" %}
 <!DOCTYPE html>
+{% include "main/header.html" %}
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -147,6 +147,43 @@
             color: #666;
             line-height: 1.6;
         }
+
+        /* Стили для уведомлений */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .notification.success {
+            background: #28a745;
+        }
+
+        .notification.error {
+            background: #dc3545;
+        }
+
+        .notification.info {
+            background: #667eea;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -166,15 +203,15 @@
                 <div class="product-price">{{ product.price }} ₽</div>
 
                 <div class="product-actions">
-                    <!-- Кнопка "В корзину" через API -->
-                    <button onclick="addToCart({{ product.product_id }})" class="btn btn-primary">
+                    <!-- Кнопки используют ОДНУ функцию sendToAPI -->
+                    <button onclick="sendToAPI({{ product.product_id }}, 'add_to_cart')"
+                            class="btn btn-primary cart-btn-{{ product.product_id }}">
                         <i class="fas fa-shopping-cart"></i> В корзину
                     </button>
 
-                    <!-- Кнопка "В избранное" через API -->
-                    <button onclick="toggleFavorite({{ product.product_id }})"
-                            class="btn {% if is_in_wishlist %}btn-outline{% else %}btn-secondary{% endif %}"
-                            id="favorite-btn">
+                    <button onclick="sendToAPI({{ product.product_id }}, 'add_to_favorites')"
+                            class="btn {% if is_in_wishlist %}btn-outline{% else %}btn-secondary{% endif %} favorite-btn-{{ product.product_id }}"
+                            id="favorite-btn-{{ product.product_id }}">
                         <i class="fas fa-heart"></i>
                         {% if is_in_wishlist %}В избранном{% else %}В избранное{% endif %}
                     </button>
@@ -190,23 +227,20 @@
         </div>
     </div>
 
-    <!-- Тот же самый JavaScript для работы с API -->
+    <!-- Упрощённый JavaScript - ОДНА функция для всех -->
     <script>
-        // Функции из главной страницы
+        // Утилита для показа уведомлений
         function showNotification(message, type = 'info') {
-            // Удаляем предыдущее уведомление
             const oldNotification = document.querySelector('.notification');
             if (oldNotification) {
                 oldNotification.remove();
             }
 
-            // Создаем новое
             const notification = document.createElement('div');
             notification.className = `notification ${type}`;
             notification.textContent = message;
             document.body.appendChild(notification);
 
-            // Автоудаление через 3 секунды
             setTimeout(() => {
                 notification.style.opacity = '0';
                 notification.style.transform = 'translateX(100%)';
@@ -219,30 +253,25 @@
             return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
         }
 
-        // Единая функция для обработки действий
-        async function handleAction(productId, action) {
-            // Определяем кнопку по action
-            let button;
-            let originalHTML;
+        // ОДНА функция для всех запросов к homeAPIView
+        async function sendToAPI(productId, action) {
+            // Находим кнопку по productId и action
+            const buttonClass = action === 'add_to_cart' ? `cart-btn-${productId}` : `favorite-btn-${productId}`;
+            const button = document.querySelector(`.${buttonClass}`);
 
-            if (action === 'add_to_cart') {
-                button = document.querySelector(`.cart-btn-${productId}`);
-            } else if (action === 'add_to_favorites') {
-                button = document.querySelector(`.favorite-btn-${productId}`);
-            } else {
-                showNotification('Неизвестное действие', 'error');
+            if (!button) {
+                showNotification('Ошибка: кнопка не найдена', 'error');
                 return;
             }
 
-            originalHTML = button.innerHTML;
+            const originalHTML = button.innerHTML;
 
             try {
                 // Показываем состояние загрузки
                 button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Обработка...';
-                button.classList.add('loading');
                 button.disabled = true;
 
-                // Отправляем запрос к единому API
+                // Отправляем запрос в КЛАСС homeAPIView
                 const response = await fetch('/api/', {
                     method: 'POST',
                     headers: {
@@ -258,76 +287,59 @@
                 if (response.ok) {
                     const result = await response.json();
 
-                    // Обрабатываем результат в зависимости от action
+                    // Показываем уведомление
+                    showNotification(result.message || 'Успешно!', 'success');
+
+                    // Обработка для корзины
                     if (action === 'add_to_cart') {
-                        showNotification(result.message || 'Товар добавлен в корзину!', 'success');
-                        // Обновляем счетчик в корзине, если он есть
-                        updateCartCounter(result.cart_count);
-                    } else if (action === 'add_to_favorites') {
-                        // Меняем иконку в зависимости от состояния
+                        updateCartCounter(result.cart_count || 0);
+                    }
+
+                    // Обработка для избранного
+                    if (action === 'add_to_favorites' && result.is_favorite !== undefined) {
                         if (result.is_favorite) {
                             button.innerHTML = '<i class="fas fa-heart" style="color: #dc3545;"></i> В избранном';
+                            button.className = button.className.replace('btn-secondary', 'btn-outline');
                             button.style.color = '#dc3545';
                             button.style.borderColor = '#dc3545';
-                            showNotification('Добавлено в избранное', 'success');
                         } else {
                             button.innerHTML = '<i class="fas fa-heart"></i> В избранное';
+                            button.className = button.className.replace('btn-outline', 'btn-secondary');
                             button.style.color = '';
                             button.style.borderColor = '';
-                            showNotification('Удалено из избранного', 'info');
                         }
                     }
                 } else {
                     const error = await response.json();
-                    showNotification(error.detail || error.message || 'Ошибка выполнения', 'error');
+                    showNotification(error.detail || error.message || 'Ошибка', 'error');
                 }
             } catch (error) {
                 console.error('Ошибка сети:', error);
-                showNotification('Ошибка соединения с сервером', 'error');
+                showNotification('Ошибка соединения', 'error');
             } finally {
-                // Восстанавливаем кнопку только если это не избранное
-                // (для избранного мы уже поменяли HTML выше)
+                // Для корзины возвращаем исходный текст
                 if (action === 'add_to_cart') {
                     button.innerHTML = originalHTML;
                 }
-                button.classList.remove('loading');
                 button.disabled = false;
             }
         }
 
-        // Обновление счетчика корзины в шапке (если есть такой элемент)
+        // Обновление счетчика корзины в шапке
         function updateCartCounter(count) {
             const cartCounter = document.querySelector('.cart-counter, #cart-counter, .navbar .cart-count');
             if (cartCounter) {
                 cartCounter.textContent = count;
-                cartCounter.style.display = count > 0 ? 'inline-block' : 'none';
+                if (count > 0) {
+                    cartCounter.style.display = 'inline-block';
+                }
             }
         }
 
-        // Инициализация при загрузке страницы
+        // Проверяем при загрузке страницы
         document.addEventListener('DOMContentLoaded', function() {
-            // Анимация карточек
-            const cards = document.querySelectorAll('.product-card');
-            cards.forEach(card => {
-                card.classList.add('fade-in');
-            });
-
-            // Плавный скролл для якорных ссылок
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    const target = document.querySelector(this.getAttribute('href'));
-                    if (target) {
-                        target.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start'
-                        });
-                    }
-                });
-            });
-
-            // Можно также загрузить начальное состояние избранного с сервера
-            // и подсветить кнопки для товаров, уже находящихся в избранном
+            // Здесь можно добавить дополнительную логику
+            console.log('Страница товара загружена');
         });
     </script>
 </body>
