@@ -43,15 +43,12 @@ def register(request):
 
 
 class homeAPIView(APIView):
-    pass
-
-
-def home(request):
-    username = request.user.username
-    if request.method == "POST":
-        action = request.POST.get('action')
-        if action =="add_to_cart":
-            _id = request.POST.get('product_id')
+    def post(self, request):
+        message = ''
+        action = request.data.get('action')
+        username = request.user.username
+        if action == "add_to_cart":
+            _id = request.data.get('product_id')
             info = Product.objects.get(product_id=int(_id))
             if not Cart.objects.filter(product_id=_id, user=username).exists():
                 new_product = Cart.objects.create(
@@ -62,12 +59,15 @@ def home(request):
                     count=1,
                     user=username
                 )
+                message = 'Товар добавлен в коризну'
             else:
                 cart_item = Cart.objects.get(product_id=_id, user=username)
                 cart_item.count += 1
                 cart_item.save()
-        elif action=="add_to_favorites":
-            _id = request.POST.get('product_id')
+                message = 'количество товара в корзине увеличено'
+
+        elif action == "add_to_favorites":
+            _id = request.data.get('product_id')
             info = Product.objects.get(product_id=int(_id))
             wish = Wishlist.objects.filter(product_id=_id, username=username)
             if not wish.exists():
@@ -78,12 +78,25 @@ def home(request):
                     product_id=info.product_id,
                     username=username
                 )
+                message = 'товар добавлен в избранное'
             elif wish.exists():
                 wish.delete()
+                message = 'товар удалён из избранного'
+        cart_count = Cart.objects.filter(user=username).count()
+        return Response({
+            'message': message,
+            'cart_count': cart_count
+        })
 
+
+def home(request):
     products = Product.objects.all()
     is_seller = request.user.groups.filter(name='seller').exists()
-    return render(request, "main/home.html", {"products": products, "is_seller": is_seller})
+
+    return render(request, "main/home.html", {
+        "products": products,
+        "is_seller": is_seller
+    })
 
 
 class CartAPIView(APIView):

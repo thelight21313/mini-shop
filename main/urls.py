@@ -1,12 +1,12 @@
 from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
-from .views import CartAPIView
+from .views import CartAPIView, homeAPIView
 
 urlpatterns = [
     path('register/', views.register, name='register'),
-    path('', views.home, name='home'),
-    path('api/', views.homeAPIView.as_view(), name = 'home_api'),
+    path('', views.home(), name='home'),
+    path('api/', homeAPIView .as_view(), name='main_api'),
     path('home/cart/', views.cart, name='cart'),
     path('api/cart/', views.CartAPIView.as_view(), name='cart_api'),
     path('exit/', views.exit, name='exit'),
