@@ -47,6 +47,7 @@ class homeAPIView(APIView):
         message = ''
         action = request.data.get('action')
         username = request.user.username
+        is_favorite = False
         if action == "add_to_cart":
             _id = request.data.get('product_id')
             info = Product.objects.get(product_id=int(_id))
@@ -79,12 +80,15 @@ class homeAPIView(APIView):
                     username=username
                 )
                 message = 'товар добавлен в избранное'
+                is_favorite = True
             elif wish.exists():
                 wish.delete()
                 message = 'товар удалён из избранного'
+                is_favorite = False
         cart_count = Cart.objects.filter(user=username).count()
         return Response({
             'message': message,
+            'is_favorite': is_favorite,
             'cart_count': cart_count
         })
 
