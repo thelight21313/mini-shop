@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.hashers import check_password
 from .models import Account, Product, Cart, Wishlist
 from argon2 import PasswordHasher
@@ -139,6 +139,7 @@ class CartAPIView(APIView):
         response_data['items_count'] = cart_items.count()
         return Response(response_data, status=status.HTTP_200_OK)
 
+
 def cart(request):
     username = request.user.username
     cart_items = Cart.objects.filter(user=username)
@@ -150,6 +151,7 @@ def cart(request):
         "cart_total": cart_total
     }
     return render(request, "main/cart.html", context)
+
 
 def create_payment(request):
     if request.method != "POST":
@@ -191,8 +193,17 @@ def exit(request):
 
 @login_required
 def product_detail(request, product_id):
-    product =''
-    context = {}
+    product = get_object_or_404(Product, product_id=product_id)
+
+    is_in_wishlist = False
+
+    if request.user.is_authenticated:
+        if Wishlist.objects.filter(username=request.user.username, product_id=product_id).exist():
+            is_in_wishlist = True
+    context = {
+        'product': product,
+        'is_in_wishlist': is_in_wishlist
+    }
     return render(request, 'main/product_detail.html', context)
 
 
