@@ -198,7 +198,7 @@ def product_detail(request, product_id):
     is_in_wishlist = False
 
     if request.user.is_authenticated:
-        if Wishlist.objects.filter(username=request.user.username, product_id=product_id).exist():
+        if Wishlist.objects.filter(username=request.user.username, product_id=product_id).exists():
             is_in_wishlist = True
     context = {
         'product': product,
