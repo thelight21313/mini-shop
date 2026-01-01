@@ -262,7 +262,8 @@ def create_product(request):
             title=title,
             price=price,
             image_url=image_url,
-            product_id=new_product_id
+            product_id=new_product_id,
+            description = description
         )
         return redirect('home')
 
