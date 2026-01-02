@@ -227,6 +227,7 @@ def create_payment(request):
         return redirect('cart')
 
 
+@csrf_exempt
 def yookassa_webhook(request):
     if request.method != "POST":
         return HttpResponse(status=400)
@@ -238,14 +239,14 @@ def yookassa_webhook(request):
         payment_id = payment_data.get('id')
 
         try:
-            order = Order.objects.filter(payment_id=payment_id)
+            order = Order.objects.get(payment_id=payment_id)
         except Order.DoesNotExist:
             return HttpResponse(status=400)
 
         if event == "payment.succeeded":
             order.status = "completed"
             order.save()
-
+            deleted_count = Cart.objects.filter(user=order.user).delete()
         elif event == "payment.canceled":
             order.status = "canceled"
             order.save()
@@ -256,7 +257,7 @@ def yookassa_webhook(request):
 
         return HttpResponse(status=200)
     except Exception as e:
-        return HttpResponse(status=400)
+        return HttpResponse(status=500)
 
 
 def exit(request):
