@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-
+import json
 
 class Account(models.Model):
     username = models.CharField(max_length=100, unique=True)
@@ -50,3 +50,27 @@ class Wishlist(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Order(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Ожидает оплаты'),
+        ('pending_capture', 'Ожидает подтверждения'),
+        ('completed', 'Оплачен'),
+        ('failed', 'Неудачный'),
+        ('canceled', 'Отменен'),
+    ]
+
+    user = models.CharField(max_length=100)
+    total_amount = models.IntegerField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    payment_id = models.CharField(max_length=100, null=True, blank=True)
+    items = models.TextField()  # JSON с товарами
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def get_items(self):
+        return json.loads(self.items) if self.items else []
+
+    def __str__(self):
+        return f"Order #{self.id} - {self.user} - {self.total_amount} RUB"

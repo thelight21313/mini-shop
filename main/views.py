@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.hashers import check_password
-from .models import Account, Product, Cart, Wishlist
+from .models import Account, Product, Cart, Wishlist, Order
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 from datetime import date
@@ -15,6 +15,10 @@ from rest_framework.response import Response
 from rest_framework import status
 from .serializers import CounterSerializer
 from rest_framework.views import APIView
+import json
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.urls import reverse
 
 
 def index(request):
@@ -99,12 +103,26 @@ def home(request):
     cart_count = Cart.objects.filter(user=username).count()
     products = Product.objects.all()
     is_seller = request.user.groups.filter(name='seller').exists()
+    payment_success = request.GET.get('payment_success') == 'true'
+    order_id = request.GET.get('order_id')
 
-    return render(request, "main/home.html", {
-        ''
+    # Если нужно, очищаем корзину после успешной оплаты
+    if payment_success and order_id:
+        try:
+            order = Order.objects.get(id=order_id, user=request.user.username)
+            if order.status == 'completed':
+                # Очищаем корзину
+                Cart.objects.filter(user=request.user.username).delete()
+        except Order.DoesNotExist:
+            pass
+
+    context = {
         "products": products,
-        "is_seller": is_seller
-    })
+        "is_seller": is_seller,
+        "show_payment_success": payment_success,  # Флаг для JS
+        "order_id": order_id if payment_success else None,
+    }
+    return render(request, "main/home.html", context)
 
 
 class CartAPIView(APIView):
@@ -163,27 +181,82 @@ def create_payment(request):
     cart_items = Cart.objects.filter(user=username)
     cart_total = sum(item.price * item.count for item in cart_items)
 
-    amount_value = str(cart_total)
+    order = Order.objects.create(
+        user=username,
+        total_amount=cart_total,
+        status='pending',
+        payment_id=None,  # заполним после создания платежа
+        items=json.dumps([{
+            'title': item.title,
+            'price': item.price,
+            'count': item.count,
+            'product_id': item.product_id
+        } for item in cart_items])
+    )
 
     idempotence_key = str(uuid.uuid4())
     try:
+        return_url = request.build_absolute_uri(
+            f"{reverse('home')}?payment_success=true&order_id={order.id}"
+        )
+
         payment = Payment.create({
             "amount": {
-                "value": amount_value,
+                "value": str(cart_total),
                 "currency": "RUB"
             },
             "confirmation": {
                 "type": "redirect",
-                "return_url": "158.160.108.224:8000/"  # Полный URL
+                "return_url": return_url  # Полный URL с доменом
             },
             "capture": True,
-            "description": f"Оплата корзины пользователя {username}"
+            "description": f"Оплата заказа #{order.id} пользователя {username}",
+            "metadata": {
+                "order_id": order.id,
+                "user": username
+            }
         }, idempotence_key)
+        order.payment_id = payment.id
+        order.save()
         return redirect(payment.confirmation.confirmation_url)
 
     except Exception as e:
+        order.status = "failed"
+        order.save()
         print(f"Ошибка создания платежа: {e}")
         return redirect('cart')
+
+
+def yookassa_webhook(request):
+    if request.method != "POST":
+        return HttpResponse(status=400)
+
+    try:
+        event_json = json.loads(request.body.decode('utf-8'))
+        event = event_json.get('event')
+        payment_data = event_json.get('object', {})
+        payment_id = payment_data.get('id')
+
+        try:
+            order = Order.objects.filter(payment_id=payment_id)
+        except Order.DoesNotExist:
+            return HttpResponse(status=400)
+
+        if event == "payment.succeeded":
+            order.status = "completed"
+            order.save()
+
+        elif event == "payment.canceled":
+            order.status = "canceled"
+            order.save()
+
+        elif event == "payment.waiting_for_capture":
+            order.status = 'pending_capture'
+            order.save()
+
+        return HttpResponse(status=200)
+    except Exception as e:
+        return HttpResponse(status=400)
 
 
 def exit(request):

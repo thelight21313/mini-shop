@@ -25,4 +25,5 @@ urlpatterns = [
     path('contacts/', views.contacts, name='contacts'),
     path('create_payment/', views.create_payment, name='create_payment'),
     path('create_product/', views.create_product, name='create_product'),
+    path('yookassa/webhook/', views.yookassa_webhook, name='yookassa_webhook'),
 ]
