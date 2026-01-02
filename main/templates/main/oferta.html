@@ -1,19 +1,332 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-    <title>Публичная оферта</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Публичная оферта | Магазин</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .oferta-container {
+            flex: 1;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            width: 100%;
+        }
+
+        .oferta-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .oferta-header h1 {
+            font-size: 2.5rem;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .oferta-header .subtitle {
+            font-size: 1.1rem;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .oferta-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            margin-bottom: 40px;
+        }
+
+        .clause {
+            margin-bottom: 30px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .clause:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .clause-number {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 32px;
+            font-weight: 600;
+            margin-right: 15px;
+            font-size: 0.9rem;
+        }
+
+        .clause-title {
+            display: inline-block;
+            font-size: 1.2rem;
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .clause-text {
+            color: #555;
+            font-size: 1.05rem;
+            line-height: 1.7;
+            margin-top: 10px;
+            padding-left: 47px;
+        }
+
+        .highlight {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 25px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .highlight p {
+            margin: 0;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .contact-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 15px;
+            padding-left: 47px;
+        }
+
+        .contact-icon {
+            color: #667eea;
+            font-size: 1.2rem;
+        }
+
+        .contact-text {
+            color: #555;
+            font-size: 1.05rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 30px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateX(-5px);
+        }
+
+        footer {
+            background: white;
+            padding: 30px 40px;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #e0e0e0;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-content p {
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .footer-links a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #5a6fd8;
+            text-decoration: underline;
+        }
+
+        .copyright {
+            color: #888;
+            font-size: 0.85rem;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .oferta-container {
+                padding: 20px;
+            }
+
+            .oferta-header h1 {
+                font-size: 2rem;
+            }
+
+            .oferta-content {
+                padding: 30px 20px;
+            }
+
+            .clause-text, .contact-info {
+                padding-left: 0;
+            }
+
+            .contact-info {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .footer-links {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .oferta-header h1 {
+                font-size: 1.8rem;
+            }
+
+            .clause-title {
+                font-size: 1.1rem;
+            }
+
+            .clause-text {
+                font-size: 1rem;
+            }
+        }
+
+        .legal-notice {
+            font-size: 0.9rem;
+            color: #888;
+            font-style: italic;
+            margin-top: 10px;
+            text-align: center;
+            padding: 10px;
+            border-top: 1px dashed #ddd;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <h1>Договор публичной оферты</h1>
-    <p>Интернет-магазин Minishops предлагает заключить договор купли-продажи товаров.</p>
-    <p>1. Цены указаны в рублях.</p>
-    <p>2. Оплата через ЮKassa.</p>
-    <p>3. Возврат в течение 14 дней.</p>
-    <p>4. Контакты: artemijpopkov6@gmail.com</p>
-    <p>5. Все товары вымышлены и не будут предоставлены при покупке</p>
+    <div class="oferta-container">
+        <a href="{% url 'home' %}" class="back-link">
+            <i class="fas fa-arrow-left"></i> Вернуться в магазин
+        </a>
+
+        <div class="oferta-header">
+            <h1>Договор публичной оферты</h1>
+            <p class="subtitle">Интернет-магазин Minishops предлагает заключить договор купли-продажи товаров</p>
+        </div>
+
+        <div class="oferta-content">
+            <div class="clause">
+                <div class="clause-number">1</div>
+                <div class="clause-title">Цены и валюта</div>
+                <div class="clause-text">
+                    Все цены на товары указаны в российских рублях (₽). Цены являются окончательными и включают в себя все необходимые налоги. Магазин оставляет за собой право изменять цены на товары без предварительного уведомления.
+                </div>
+            </div>
+
+            <div class="clause">
+                <div class="clause-number">2</div>
+                <div class="clause-title">Оплата</div>
+                <div class="clause-text">
+                    Оплата товаров осуществляется через безопасную платежную систему <strong>ЮKassa</strong>. Мы принимаем банковские карты, электронные кошельки и другие доступные способы оплаты через указанную платежную систему.
+                </div>
+            </div>
+
+            <div class="clause">
+                <div class="clause-number">3</div>
+                <div class="clause-title">Возврат товаров</div>
+                <div class="clause-text">
+                    Покупатель имеет право вернуть товар надлежащего качества в течение <strong>14 календарных дней</strong> с момента получения заказа, при условии сохранения товарного вида и упаковки товара.
+                </div>
+            </div>
+
+            <div class="clause">
+                <div class="clause-number">4</div>
+                <div class="clause-title">Контакты и поддержка</div>
+                <div class="clause-text">
+                    Для связи с нами используйте следующие контактные данные:
+                    <div class="contact-info">
+                        <i class="fas fa-envelope contact-icon"></i>
+                        <span class="contact-text">artemijpopkov6@gmail.com</span>
+                    </div>
+                    <div class="contact-info">
+                        <i class="fas fa-clock contact-icon"></i>
+                        <span class="contact-text">Время ответа: в течение 24 часов в рабочие дни</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="highlight">
+                <p><i class="fas fa-exclamation-triangle" style="color: #ffc107; margin-right: 10px;"></i>
+                <strong>Важная информация:</strong> Все представленные в магазине товары являются вымышленными. Данный сайт создан в демонстрационных целях, и товары не будут фактически предоставлены при совершении покупки.</p>
+            </div>
+
+            <div class="legal-notice">
+                Нажимая кнопку "Купить" или совершая оплату, вы соглашаетесь с условиями данной публичной оферты.
+            </div>
+        </div>
+    </div>
+
     <footer>
-        <p>ИНН: 231151169943</p>
-        <!-- остальные ссылки -->
+        <div class="footer-content">
+            <p>ИНН: 231151169943</p>
+            <div class="footer-links">
+                <a href="{% url 'home' %}"><i class="fas fa-home"></i> Главная</a>
+                <a href="{% url 'about' %}"><i class="fas fa-info-circle"></i> О компании</a>
+                <a href="{% url 'oferta' %}"><i class="fas fa-file-contract"></i> Публичная оферта</a>
+                <a href="{% url 'contacts' %}"><i class="fas fa-envelope"></i> Контакты</a>
+            </div>
+            <div class="copyright">
+                © 2025 Интернет-магазин Minishops. Все права защищены.
+            </div>
+        </div>
     </footer>
 </body>
 </html>

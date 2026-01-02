@@ -1,18 +1,411 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-    <title>Контакты</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Контакты | Магазин</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .contacts-container {
+            flex: 1;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            width: 100%;
+        }
+
+        .contacts-header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .contacts-header h1 {
+            font-size: 2.5rem;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .contacts-header .subtitle {
+            font-size: 1.1rem;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .contacts-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .contact-card {
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .contact-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+            border-color: rgba(102, 126, 234, 0.2);
+        }
+
+        .contact-card h2 {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+        }
+
+        .contact-card h2 i {
+            color: #667eea;
+            font-size: 1.4rem;
+        }
+
+        .contact-item {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .contact-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .contact-label {
+            display: block;
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .contact-value {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.1rem;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .contact-value i {
+            color: #667eea;
+            width: 24px;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+
+        .contact-link {
+            color: #667eea;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .contact-link:hover {
+            color: #5a6fd8;
+            text-decoration: underline;
+            transform: translateX(5px);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 20px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .social-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            color: #2c3e50;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .social-link:hover {
+            background: white;
+            border-color: #667eea;
+            color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);
+        }
+
+        .social-link i {
+            font-size: 1.3rem;
+        }
+
+        .social-link.github {
+            background: #333;
+            color: white;
+        }
+
+        .social-link.github:hover {
+            background: #24292e;
+            border-color: #333;
+            color: white;
+        }
+
+        .social-link.telegram {
+            background: #0088cc;
+            color: white;
+        }
+
+        .social-link.telegram:hover {
+            background: #0077b5;
+            border-color: #0088cc;
+            color: white;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 30px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateX(-5px);
+        }
+
+        footer {
+            background: white;
+            padding: 30px 40px;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #e0e0e0;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-content p {
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .footer-links a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #5a6fd8;
+            text-decoration: underline;
+        }
+
+        .copyright {
+            color: #888;
+            font-size: 0.85rem;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .contacts-container {
+                padding: 20px;
+            }
+
+            .contacts-header h1 {
+                font-size: 2rem;
+            }
+
+            .contacts-content {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-card {
+                padding: 25px;
+            }
+
+            .social-links {
+                justify-content: center;
+            }
+
+            .footer-links {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .contacts-header h1 {
+                font-size: 1.8rem;
+            }
+
+            .social-link {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .contact-value {
+                font-size: 1rem;
+            }
+        }
+
+        .working-hours {
+            background: rgba(102, 126, 234, 0.05);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .working-hours p {
+            margin: 5px 0;
+            color: #555;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <h1>Контакты</h1>
-    <p><strong>ИП/Самозанятый:</strong> Попков Артемий Александрович</p>
-    <p><strong>ИНН:</strong> 231151169943 </p>
-    <p><strong>Телефон:</strong> +7 (999) 123-45-67</p>
-    <p><strong>Email:</strong> artemijpopkov6@gmail.com</p>
-    <p><strong>Адрес:</strong> г. Москва, ул. Примерная, д. 1</p>
+    <div class="contacts-container">
+        <a href="{% url 'home' %}" class="back-link">
+            <i class="fas fa-arrow-left"></i> Вернуться в магазин
+        </a>
+
+        <div class="contacts-header">
+            <h1>Контакты</h1>
+            <p class="subtitle">Свяжитесь с нами любым удобным способом</p>
+        </div>
+
+        <div class="contacts-content">
+            <!-- Карточка с юридической информацией -->
+            <div class="contact-card">
+                <h2><i class="fas fa-user-tie"></i> Юридическая информация</h2>
+
+                <div class="contact-item">
+                    <span class="contact-label">Самозанятый</span>
+                    <div class="contact-value">
+                        <i class="fas fa-user"></i>
+                        <span>Попков Артемий Александрович</span>
+                    </div>
+                </div>
+
+                <div class="contact-item">
+                    <span class="contact-label">Идентификационный номер</span>
+                    <div class="contact-value">
+                        <i class="fas fa-id-card"></i>
+                        <span>231151169943</span>
+                    </div>
+                </div>
+
+                <div class="contact-item">
+                    <span class="contact-label">Юридический адрес</span>
+                    <div class="contact-value">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>г. Москва, ул. Примерная, д. 1</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Карточка с контактами -->
+            <div class="contact-card">
+                <h2><i class="fas fa-envelope"></i> Связь с нами</h2>
+
+                <div class="contact-item">
+                    <span class="contact-label">Электронная почта</span>
+                    <div class="contact-value">
+                        <i class="fas fa-envelope"></i>
+                        <a href="mailto:artemijpopkov6@gmail.com" class="contact-link">
+                            artemijpopkov6@gmail.com
+                        </a>
+                    </div>
+                </div>
+
+                <div class="contact-item">
+                    <span class="contact-label">Социальные сети</span>
+                    <div class="social-links">
+                        <a href="https://t.me/Enix2" target="_blank" class="social-link telegram">
+                            <i class="fab fa-telegram"></i>
+                            Telegram: @Enix2
+                        </a>
+                        <a href="https://github.com/thelight21313" target="_blank" class="social-link github">
+                            <i class="fab fa-github"></i>
+                            GitHub
+                        </a>
+                    </div>
+                </div>
+
+                <div class="working-hours">
+                    <p><i class="fas fa-clock" style="color: #667eea; margin-right: 8px;"></i>
+                    <strong>Время ответа:</strong> в течение 24 часов</p>
+                    <p><i class="fas fa-calendar-alt" style="color: #667eea; margin-right: 8px;"></i>
+                    <strong>Рабочие дни:</strong> Понедельник - Пятница</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <footer>
-        <p>ИНН: 231151169943</p>
-        <!-- остальные ссылки -->
+        <div class="footer-content">
+            <p>ИНН: 231151169943</p>
+            <div class="footer-links">
+                <a href="{% url 'home' %}"><i class="fas fa-home"></i> Главная</a>
+                <a href="{% url 'about' %}"><i class="fas fa-info-circle"></i> О компании</a>
+                <a href="{% url 'oferta' %}"><i class="fas fa-file-contract"></i> Публичная оферта</a>
+                <a href="{% url 'contacts' %}"><i class="fas fa-envelope"></i> Контакты</a>
+            </div>
+            <div class="copyright">
+                © 2025 Интернет-магазин Minishops. Все права защищены.
+            </div>
+        </div>
     </footer>
 </body>
 </html>
