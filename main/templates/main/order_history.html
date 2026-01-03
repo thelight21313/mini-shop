@@ -27,7 +27,7 @@
         .back-link {
             display: inline-flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             color: #667eea;
             text-decoration: none;
             font-weight: 600;
@@ -44,12 +44,6 @@
             background: #f0f2ff;
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-        }
-
-        .back-link::before {
-            content: "←";
-            font-weight: bold;
-            font-size: 1.2rem;
         }
 
         h1 {
@@ -69,6 +63,11 @@
             border-radius: 15px;
             padding: 25px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .order-card:hover {
+            transform: translateY(-5px);
         }
 
         .order-header {
@@ -136,7 +135,7 @@
         .btn {
             display: inline-block;
             padding: 12px 25px;
-            background: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             text-decoration: none;
             border-radius: 8px;
@@ -144,11 +143,12 @@
             margin-top: 20px;
             border: none;
             cursor: pointer;
+            transition: all 0.3s ease;
         }
 
         .btn:hover {
-            background: #5a6fd8;
             transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
 
         .empty-state {
@@ -163,6 +163,29 @@
             font-size: 4rem;
             color: #dee2e6;
             margin-bottom: 20px;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .order-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .order-info {
+                grid-template-columns: 1fr;
+            }
+
+            .back-link {
+                width: 100%;
+                justify-content: center;
+                margin-bottom: 20px;
+            }
+
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
         }
     </style>
 </head>
