@@ -297,11 +297,19 @@ def profile(request):
             cart_items_count += item.count
     except:
         pass
-    user = request.user
     wishlist = Wishlist.objects.filter(username=username)
     for wish in wishlist:
         wishlist_count+=1
-    return render(request, 'main/profile.html', {"user": user, "cart_items_count": cart_items_count, "wishlist":wishlist, "wishlist_count":wishlist_count})
+    orders = Order.objects.filter(user=username).order_by('-created_at')
+
+    total_spent = sum(order.total_amount for order in orders.filter(status='completed'))
+    context = {"user": request.user,
+               "cart_items_count": cart_items_count,
+               "wishlist": wishlist,
+               "wishlist_count":  wishlist_count,
+               "orders": orders,
+               "total_spent": total_spent}
+    return render(request, 'main/profile.html', context)
 
 
 def order_history(request):
@@ -342,3 +350,23 @@ def create_product(request):
         return redirect('home')
 
     return render(request, "main/create_product.html")
+
+
+@login_required
+def order_history(request):
+    orders = Order.objects.filter(user=request.user.username).order_by('-created_at')
+
+    return render(request, 'main/order_history.html', {
+        'orders': orders,
+        'user': request.user,
+    })
+
+
+@login_required
+def order_detail(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user.username)
+
+    return render(request, 'main/order_detail.html', {
+        'order': order,
+        'user': request.user,
+    })
