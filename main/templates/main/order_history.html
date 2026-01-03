@@ -16,12 +16,16 @@
         body {
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
-            padding: 20px;
+            padding-top: 80px; /* Добавлено отступ сверху */
+            padding-left: 20px;
+            padding-right: 20px;
+            padding-bottom: 20px;
         }
 
         .container {
             max-width: 1000px;
             margin: 0 auto;
+            position: relative;
         }
 
         .back-link {
@@ -38,6 +42,10 @@
             box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
             border: 2px solid #667eea;
             transition: all 0.3s ease;
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 10;
         }
 
         .back-link:hover {
@@ -50,6 +58,7 @@
             text-align: center;
             margin-bottom: 30px;
             color: #333;
+            margin-top: 70px; /* Отступ для заголовка, чтобы не перекрывался кнопкой */
         }
 
         .orders-list {
@@ -157,6 +166,7 @@
             background: white;
             border-radius: 15px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-top: 70px; /* Отступ для пустого состояния */
         }
 
         .empty-state i {
@@ -167,6 +177,10 @@
 
         /* Адаптивность */
         @media (max-width: 768px) {
+            body {
+                padding-top: 60px; /* Меньший отступ на мобильных */
+            }
+
             .order-header {
                 flex-direction: column;
                 align-items: flex-start;
@@ -177,14 +191,25 @@
             }
 
             .back-link {
+                position: relative;
                 width: 100%;
                 justify-content: center;
                 margin-bottom: 20px;
+                top: auto;
+                left: auto;
+            }
+
+            h1 {
+                margin-top: 0;
             }
 
             .btn {
                 width: 100%;
                 text-align: center;
+            }
+
+            .empty-state {
+                margin-top: 0;
             }
         }
     </style>
@@ -192,10 +217,9 @@
 <body>
     {% csrf_token %}
     <div class="container">
-        <a href="{% url 'profile' %}" class="btn">
+        <a href="{% url 'profile' %}" class="back-link">
             ← Назад в профиль
         </a>
-
 
         <h1>История заказов</h1>
 
@@ -250,8 +274,6 @@
                 </a>
             </div>
         {% endif %}
-
-
     </div>
 </body>
 </html>
