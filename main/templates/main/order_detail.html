@@ -171,6 +171,7 @@
     </style>
 </head>
 <body>
+    {% csrf_token %}
     <div class="container">
         <a href="{% url 'order_history' %}" class="back-link">
             ← Назад к истории заказов

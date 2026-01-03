@@ -156,6 +156,7 @@
     </style>
 </head>
 <body>
+    {% csrf_token %}
     <div class="container">
         <a href="{% url 'profile' %}" class="back-link">
             ← Назад в профиль
