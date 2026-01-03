@@ -192,9 +192,10 @@
 <body>
     {% csrf_token %}
     <div class="container">
-        <a href="{% url 'profile' %}" class="back-link">
+        <a href="{% url 'profile' %}" class="btn">
             ← Назад в профиль
         </a>
+
 
         <h1>История заказов</h1>
 
@@ -249,6 +250,8 @@
                 </a>
             </div>
         {% endif %}
+
+
     </div>
 </body>
 </html>
