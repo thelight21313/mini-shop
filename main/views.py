@@ -19,19 +19,7 @@ import json
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
-
-
-def index(request):
-    if request.method == 'POST':
-        form = AuthenticationForm(data=request.POST)
-        if form.is_valid():
-            user = form.get_user()
-            login(request, user)
-            return redirect('home')
-    else:
-        form = AuthenticationForm()
-
-    return render(request, 'main/login.html', {'form': form})
+from rest_framework.permissions import IsAuthenticated
 
 
 def register(request):
@@ -47,6 +35,7 @@ def register(request):
 
 
 class homeAPIView(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self, request):
         message = ''
         action = request.data.get('action')
@@ -64,7 +53,7 @@ class homeAPIView(APIView):
                     count=1,
                     user=username
                 )
-                message = 'Товар добавлен в коризну'
+                message = 'Товар добавлен в корзину'
             else:
                 cart_item = Cart.objects.get(product_id=_id, user=username)
                 cart_item.count += 1
@@ -97,6 +86,7 @@ class homeAPIView(APIView):
         })
 
 
+@login_required
 def home(request):
     message = ''
     username = request.user.username
@@ -126,12 +116,13 @@ def home(request):
 
 
 class CartAPIView(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self, request):
         username = request.user.username
-        profuct_id = request.data.get('product_id')
+        product_id = request.data.get('product_id')
         action = request.data.get('action')
 
-        cart_item = Cart.objects.get(product_id=profuct_id, user=username)
+        cart_item = Cart.objects.get(product_id=product_id, user=username)
 
         if action == 'plus':
             cart_item.count += 1
@@ -149,15 +140,16 @@ class CartAPIView(APIView):
             item.total_price = item.price * item.count
         cart_total = sum([item.total_price for item in cart_items])
         if cart_item.pk:
-            seriliztor = CounterSerializer(cart_item)
-            response_data = seriliztor.data
+            serilizator = CounterSerializer(cart_item)
+            response_data = serilizator.data
         else:
-            response_data = {'product_id': profuct_id, 'count': 0}
+            response_data = {'product_id': product_id, 'count': 0}
         response_data['cart_total'] = cart_total
         response_data['items_count'] = cart_items.count()
         return Response(response_data, status=status.HTTP_200_OK)
 
 
+@login_required
 def cart(request):
     username = request.user.username
     cart_items = Cart.objects.filter(user=username)
@@ -171,6 +163,7 @@ def cart(request):
     return render(request, "main/cart.html", context)
 
 
+@login_required
 def create_payment(request):
     if request.method != "POST":
         return redirect('cart')
@@ -312,18 +305,22 @@ def profile(request):
     return render(request, 'main/profile.html', context)
 
 
+@login_required
 def order_history(request):
     pass
 
 
+@login_required
 def oferta(request):
     return render(request, 'main/oferta.html')
 
 
+@login_required
 def contacts(request):
     return render(request, 'main/contacts.html')
 
 
+@login_required
 def create_product(request):
     if request.method == "POST":
         new_product_id = 0
@@ -370,3 +367,5 @@ def order_detail(request, order_id):
         'order': order,
         'user': request.user,
     })
+
+
