@@ -347,16 +347,8 @@
 
       updateColor(count) {
         let color;
-        if (count === 1) {
+        if (count >= 1) {
           color = '#4cd964'; // Зеленый
-        } else if (count >= 2 && count <= 3) {
-          color = '#ff9500'; // Оранжевый
-        } else if (count >= 4 && count <= 5) {
-          color = '#ff3b30'; // Красный
-        } else if (count >= 6 && count <= 9) {
-          color = '#c70039'; // Темно-красный
-        } else {
-          color = '#900c3f'; // Бордовый для 10+
         }
         this.counterElement.style.background = color;
       }
