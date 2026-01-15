@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8">
   <title>Магазин</title>
@@ -133,7 +133,7 @@
       box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
     }
 
-    /* Логотип (добавим) */
+    /* Логотип */
     .logo {
       display: flex;
       align-items: center;
@@ -172,15 +172,34 @@
       color: white;
       font-size: 12px;
       font-weight: bold;
-      width: 20px;
+      min-width: 20px;
       height: 20px;
-      border-radius: 50%;
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
       position: absolute;
       top: -5px;
       right: -5px;
+      padding: 0 6px;
+      transition: all 0.3s ease;
+      transform-origin: center;
+    }
+
+    /* Анимация при обновлении */
+    .cart-count.updated {
+      animation: pulse 0.5s ease;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.3); }
+      100% { transform: scale(1); }
+    }
+
+    /* Скрываем если 0 */
+    .cart-count[data-count="0"] {
+      display: none !important;
     }
 
     /* Адаптивность */
@@ -239,7 +258,13 @@
       <a href="{%url 'cart'%}" style="position: relative;">
         <i class="fas fa-shopping-cart"></i>
         Корзина
-        <span class="cart-count">3</span>
+        <!-- Счетчик с начальным значением из Django context -->
+        <span class="cart-count"
+              id="cartCounter"
+              data-count="{{ cart_count|default:0 }}"
+              style="{% if cart_count == 0 %}display: none;{% endif %}">
+          {{ cart_count|default:0 }}
+        </span>
       </a>
     </div>
 
@@ -255,5 +280,100 @@
       </a>
     </div>
   </nav>
+
+  <script>
+    // Глобальная система обновления счетчика корзины
+    class CartCounterManager {
+      constructor() {
+        this.counterElement = document.getElementById('cartCounter');
+        this.initialize();
+      }
+
+      initialize() {
+        // Начальное значение из Django шаблона
+        if (this.counterElement) {
+          const initialCount = this.counterElement.getAttribute('data-count') || '0';
+          this.updateDisplay(parseInt(initialCount));
+        }
+
+        // Слушаем глобальные события
+        this.setupEventListeners();
+      }
+
+      setupEventListeners() {
+        // Слушаем кастомные события
+        document.addEventListener('cartCountUpdated', (event) => {
+          if (event.detail && event.detail.count !== undefined) {
+            this.update(event.detail.count);
+          }
+        });
+
+        // Также можно обновлять через прямой вызов window.updateCartCounter
+        window.updateCartCounter = (count) => {
+          this.update(count);
+        };
+      }
+
+      update(count) {
+        if (this.counterElement) {
+          // Обновляем данные
+          this.counterElement.setAttribute('data-count', count);
+          this.updateDisplay(count);
+        }
+      }
+
+      updateDisplay(count) {
+        if (!this.counterElement) return;
+
+        // Обновляем текст
+        this.counterElement.textContent = count;
+
+        // Показываем/скрываем
+        if (count === 0) {
+          this.counterElement.style.display = 'none';
+        } else {
+          this.counterElement.style.display = 'flex';
+
+          // Меняем цвет в зависимости от количества
+          this.updateColor(count);
+
+          // Анимация обновления
+          this.counterElement.classList.add('updated');
+          setTimeout(() => {
+            this.counterElement.classList.remove('updated');
+          }, 500);
+        }
+      }
+
+      updateColor(count) {
+        let color;
+        if (count === 1) {
+          color = '#4cd964'; // Зеленый
+        } else if (count >= 2 && count <= 3) {
+          color = '#ff9500'; // Оранжевый
+        } else if (count >= 4 && count <= 5) {
+          color = '#ff3b30'; // Красный
+        } else if (count >= 6 && count <= 9) {
+          color = '#c70039'; // Темно-красный
+        } else {
+          color = '#900c3f'; // Бордовый для 10+
+        }
+        this.counterElement.style.background = color;
+      }
+    }
+
+    // Инициализация при загрузке страницы
+    document.addEventListener('DOMContentLoaded', () => {
+      window.cartCounterManager = new CartCounterManager();
+    });
+
+    // Простая функция для обновления извне
+    window.refreshCartCounter = function(count) {
+      const event = new CustomEvent('cartCountUpdated', {
+        detail: { count: count }
+      });
+      document.dispatchEvent(event);
+    };
+  </script>
 </body>
 </html>

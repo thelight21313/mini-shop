@@ -105,8 +105,9 @@ def home(request):
                 Cart.objects.filter(user=request.user.username).delete()
         except Order.DoesNotExist:
             pass
-
+    cart_count = Cart.objects.filter(user=username).count()
     context = {
+        'cart_count': cart_count,
         "products": products,
         "is_seller": is_seller,
         "show_payment_success": payment_success,  # Флаг для JS
@@ -294,14 +295,15 @@ def profile(request):
     for wish in wishlist:
         wishlist_count+=1
     orders = Order.objects.filter(user=username).order_by('-created_at')
-
+    cart_count = Cart.objects.filter(user=username).count()
     total_spent = sum(order.total_amount for order in orders.filter(status='completed'))
     context = {"user": request.user,
                "cart_items_count": cart_items_count,
                "wishlist": wishlist,
                "wishlist_count":  wishlist_count,
                "orders": orders,
-               "total_spent": total_spent}
+               "total_spent": total_spent,
+               "cart_count": cart_count}
     return render(request, 'main/profile.html', context)
 
 
