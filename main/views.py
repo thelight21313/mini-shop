@@ -148,7 +148,8 @@ class CartAPIView(APIView):
         response_data['cart_total'] = cart_total
         response_data['items_count'] = cart_items.count()
         cart_count = Cart.objects.filter(user=username).count()
-        return Response({'cart_count': cart_count}, response_data, status=status.HTTP_200_OK)
+        response_data['cart_count'] = cart_count
+        return Response(response_data, status=status.HTTP_200_OK)
 
 
 @login_required
