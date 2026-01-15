@@ -367,5 +367,3 @@ def order_detail(request, order_id):
         'order': order,
         'user': request.user,
     })
-
-
