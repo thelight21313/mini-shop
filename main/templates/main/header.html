@@ -282,31 +282,27 @@
   </nav>
 
 <script>
-// Супер простой вариант
-(function() {
+// Функция обновления счетчика - максимально простая
+function updateCartCounter(count) {
     const counter = document.getElementById('cartCounter');
+    if (!counter) return;
 
-    window.updateCartCount = function(count) {
-        if (!counter) return;
+    counter.textContent = count;
+    counter.setAttribute('data-count', count);
+    counter.style.display = count > 0 ? 'flex' : 'none';
+}
 
-        counter.textContent = count;
-        counter.setAttribute('data-count', count);
+// Сделаем функцию глобальной
+window.updateCartCounter = updateCartCounter;
 
-        if (count === 0) {
-            counter.style.display = 'none';
-        } else {
-            counter.style.display = 'flex';
-            counter.classList.add('updated');
-            setTimeout(() => counter.classList.remove('updated'), 500);
-        }
-    };
-
-    // Начальная установка
-    document.addEventListener('DOMContentLoaded', () => {
-        const startCount = counter?.getAttribute('data-count') || '0';
-        window.updateCartCount(parseInt(startCount));
-    });
-})();
+// Инициализация при загрузке
+document.addEventListener('DOMContentLoaded', function() {
+    const counter = document.getElementById('cartCounter');
+    if (counter) {
+        const count = counter.getAttribute('data-count') || '0';
+        updateCartCounter(parseInt(count));
+    }
+});
 </script>
 </body>
 </html>
