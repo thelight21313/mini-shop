@@ -20,6 +20,7 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
 from rest_framework.permissions import IsAuthenticated
+from django_ratelimit.decorators import ratelimit
 
 
 def register(request):
