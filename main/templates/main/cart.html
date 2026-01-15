@@ -141,7 +141,7 @@
 </footer>
 
 <script>
-    async function editCart(productId, action) {
+   async function editCart(productId, action) {
         const url = '/api/cart/';
         try {
             const response = await fetch(url, {
@@ -155,6 +155,11 @@
 
             if (!response.ok) return;
             const data = await response.json();
+
+            // ДОБАВЬ ЭТУ СТРОЧКУ - обновляем счетчик в шапке
+            if (window.updateCartCounter && data.cart_count !== undefined) {
+                window.updateCartCounter(data.cart_count);
+            }
 
             if (action === 'remove' || data.count === 0) {
                 const row = document.getElementById(`row-${productId}`);
@@ -179,20 +184,5 @@
         } catch (error) {
             console.error('Ошибка:', error);
         }
-    }
-
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
     }
 </script>
