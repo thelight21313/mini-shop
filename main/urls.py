@@ -2,7 +2,6 @@ from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
 from .views import CartAPIView, homeAPIView
-from django_ratelimit.decorators import ratelimit
 
 urlpatterns = [
     path('register/', views.register, name='register'),
@@ -18,12 +17,10 @@ urlpatterns = [
     path("about/", views.about, name='about'),
     path("profile/", views.profile, name='profile'),
     path('login/',
-         ratelimit(key='ip', rate='3/m', method='POST', block=True)(
              auth_views.LoginView.as_view(
                  template_name='main/index.html',
                  redirect_authenticated_user=True
-             )
-         ),
+             ),
          name='login'),
     path('logout/', views.exit, name='logout'),
     path("order_history/", views.profile, name='order_history'),
