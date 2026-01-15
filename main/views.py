@@ -147,6 +147,8 @@ class CartAPIView(APIView):
             response_data = {'product_id': product_id, 'count': 0}
         response_data['cart_total'] = cart_total
         response_data['items_count'] = cart_items.count()
+        response_data['cart_count'] = Cart.objects.filter(user=username).count()
+
         return Response(response_data, status=status.HTTP_200_OK)
 
 
@@ -157,7 +159,9 @@ def cart(request):
     for item in cart_items:
         item.total_price = item.price * item.count
     cart_total = sum([item.total_price for item in cart_items])
+    cart_count = Cart.objects.filter(user=username).count()
     context = {
+        "cart_count": cart_count,
         "cart_items": cart_items,
         "cart_total": cart_total
     }
