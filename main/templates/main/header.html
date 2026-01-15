@@ -281,91 +281,32 @@
     </div>
   </nav>
 
-  <script>
-    // Глобальная система обновления счетчика корзины
-    class CartCounterManager {
-      constructor() {
-        this.counterElement = document.getElementById('cartCounter');
-        this.initialize();
-      }
+<script>
+// Супер простой вариант
+(function() {
+    const counter = document.getElementById('cartCounter');
 
-      initialize() {
-        // Начальное значение из Django шаблона
-        if (this.counterElement) {
-          const initialCount = this.counterElement.getAttribute('data-count') || '0';
-          this.updateDisplay(parseInt(initialCount));
-        }
+    window.updateCartCount = function(count) {
+        if (!counter) return;
 
-        // Слушаем глобальные события
-        this.setupEventListeners();
-      }
+        counter.textContent = count;
+        counter.setAttribute('data-count', count);
 
-      setupEventListeners() {
-        // Слушаем кастомные события
-        document.addEventListener('cartCountUpdated', (event) => {
-          if (event.detail && event.detail.count !== undefined) {
-            this.update(event.detail.count);
-          }
-        });
-
-        // Также можно обновлять через прямой вызов window.updateCartCounter
-        window.updateCartCounter = (count) => {
-          this.update(count);
-        };
-      }
-
-      update(count) {
-        if (this.counterElement) {
-          // Обновляем данные
-          this.counterElement.setAttribute('data-count', count);
-          this.updateDisplay(count);
-        }
-      }
-
-      updateDisplay(count) {
-        if (!this.counterElement) return;
-
-        // Обновляем текст
-        this.counterElement.textContent = count;
-
-        // Показываем/скрываем
         if (count === 0) {
-          this.counterElement.style.display = 'none';
+            counter.style.display = 'none';
         } else {
-          this.counterElement.style.display = 'flex';
-
-          // Меняем цвет в зависимости от количества
-          this.updateColor(count);
-
-          // Анимация обновления
-          this.counterElement.classList.add('updated');
-          setTimeout(() => {
-            this.counterElement.classList.remove('updated');
-          }, 500);
+            counter.style.display = 'flex';
+            counter.classList.add('updated');
+            setTimeout(() => counter.classList.remove('updated'), 500);
         }
-      }
-
-      updateColor(count) {
-        let color;
-        if (count >= 1) {
-          color = '#4cd964'; // Зеленый
-        }
-        this.counterElement.style.background = color;
-      }
-    }
-
-    // Инициализация при загрузке страницы
-    document.addEventListener('DOMContentLoaded', () => {
-      window.cartCounterManager = new CartCounterManager();
-    });
-
-    // Простая функция для обновления извне
-    window.refreshCartCounter = function(count) {
-      const event = new CustomEvent('cartCountUpdated', {
-        detail: { count: count }
-      });
-      document.dispatchEvent(event);
     };
-  </script>
+
+    // Начальная установка
+    document.addEventListener('DOMContentLoaded', () => {
+        const startCount = counter?.getAttribute('data-count') || '0';
+        window.updateCartCount(parseInt(startCount));
+    });
+})();
+</script>
 </body>
 </html>
