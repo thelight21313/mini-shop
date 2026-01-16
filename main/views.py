@@ -106,7 +106,9 @@ def home(request):
         except Order.DoesNotExist:
             pass
     cart_count = Cart.objects.filter(user=username).count()
+    message = ''
     context = {
+        "message": '',
         'cart_count': cart_count,
         "products": products,
         "is_seller": is_seller,
