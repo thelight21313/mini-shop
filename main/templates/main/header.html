@@ -202,6 +202,162 @@
       display: none !important;
     }
 
+    /* МЕНЮ КАТЕГОРИЙ */
+    .categories-menu {
+      position: relative;
+      display: inline-block;
+    }
+
+    .categories-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: white;
+      min-width: 220px;
+      border-radius: 12px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.3s ease;
+      z-index: 1000;
+      padding: 10px 0;
+      margin-top: 10px;
+    }
+
+    .categories-menu:hover .categories-dropdown {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .categories-dropdown::before {
+      content: '';
+      position: absolute;
+      top: -8px;
+      left: 30px;
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-bottom: 8px solid white;
+    }
+
+    .category-item {
+      position: relative;
+    }
+
+    .category-link {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 20px;
+      color: #333;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      border-bottom: 1px solid #f5f5f5;
+    }
+
+    .category-link:hover {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding-left: 25px;
+    }
+
+    .category-link:last-child {
+      border-bottom: none;
+    }
+
+    .category-link i {
+      font-size: 14px;
+      transition: transform 0.2s ease;
+    }
+
+    .category-link:hover i {
+      transform: translateX(3px);
+    }
+
+    /* Подкатегории */
+    .subcategories {
+      position: absolute;
+      left: 100%;
+      top: 0;
+      background: white;
+      min-width: 200px;
+      border-radius: 12px;
+      box-shadow: 15px 0 40px rgba(0, 0, 0, 0.15);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(-10px);
+      transition: all 0.3s ease;
+      z-index: 1001;
+      padding: 10px 0;
+    }
+
+    .category-item:hover .subcategories {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(0);
+    }
+
+    .subcategory-link {
+      display: block;
+      padding: 10px 20px;
+      color: #333;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      border-bottom: 1px solid #f5f5f5;
+    }
+
+    .subcategory-link:hover {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding-left: 25px;
+    }
+
+    .subcategory-link:last-child {
+      border-bottom: none;
+    }
+
+    /* Кнопка категорий */
+    .categories-btn {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 16px;
+      padding: 10px 0;
+      position: relative;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      opacity: 0.9;
+      cursor: pointer;
+      background: none;
+      border: none;
+    }
+
+    .categories-btn:hover {
+      opacity: 1;
+      transform: translateY(-2px);
+    }
+
+    .categories-btn::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 3px;
+      background: white;
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+
+    .categories-btn:hover::after {
+      width: 100%;
+    }
+
     /* Адаптивность */
     @media (max-width: 768px) {
       .navbar {
@@ -233,6 +389,25 @@
         padding: 10px 15px;
         font-size: 14px;
       }
+
+      .categories-dropdown {
+        min-width: 180px;
+      }
+
+      .subcategories {
+        position: static;
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        box-shadow: none;
+        background: #f8f9fa;
+        margin-left: 20px;
+        display: none;
+      }
+
+      .category-item:hover .subcategories {
+        display: block;
+      }
     }
   </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -251,6 +426,65 @@
         <i class="fas fa-home"></i>
         Главная
       </a>
+
+      <!-- Меню категорий -->
+      <div class="categories-menu">
+        <button class="categories-btn">
+          <i class="fas fa-list"></i>
+          Категории
+        </button>
+        <div class="categories-dropdown" id="categoriesDropdown">
+          <!-- Категории будут загружены динамически -->
+          <div class="category-item">
+            <a href="#" class="category-link" data-category="electronics">
+              Электроника
+              <i class="fas fa-chevron-right"></i>
+            </a>
+            <div class="subcategories">
+              <a href="#" class="subcategory-link" data-category="smartphones">Смартфоны</a>
+              <a href="#" class="subcategory-link" data-category="laptops">Ноутбуки</a>
+              <a href="#" class="subcategory-link" data-category="headphones">Наушники</a>
+            </div>
+          </div>
+
+          <div class="category-item">
+            <a href="#" class="category-link" data-category="clothing">
+              Одежда
+              <i class="fas fa-chevron-right"></i>
+            </a>
+            <div class="subcategories">
+              <a href="#" class="subcategory-link" data-category="men_clothing">Мужская</a>
+              <a href="#" class="subcategory-link" data-category="women_clothing">Женская</a>
+              <a href="#" class="subcategory-link" data-category="kids_clothing">Детская</a>
+            </div>
+          </div>
+
+          <div class="category-item">
+            <a href="#" class="category-link" data-category="books">
+              Книги
+              <i class="fas fa-chevron-right"></i>
+            </a>
+            <div class="subcategories">
+              <a href="#" class="subcategory-link" data-category="fiction">Художественная</a>
+              <a href="#" class="subcategory-link" data-category="education">Образование</a>
+              <a href="#" class="subcategory-link" data-category="children_books">Детские</a>
+            </div>
+          </div>
+
+          <div class="category-item">
+            <a href="#" class="category-link" data-category="home_garden">
+              Дом и Сад
+              <i class="fas fa-chevron-right"></i>
+            </a>
+            <div class="subcategories">
+              <a href="#" class="subcategory-link" data-category="furniture">Мебель</a>
+              <a href="#" class="subcategory-link" data-category="kitchen">Кухня</a>
+              <a href="#" class="subcategory-link" data-category="garden">Сад</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <a href="{%url 'about'%}">
         <i class="fas fa-info-circle"></i>
         О нас
@@ -354,9 +588,178 @@
       }
     }
 
+    // Система управления категориями
+    class CategoryManager {
+      constructor() {
+        this.currentCategory = null;
+        this.initializeCategoryEvents();
+      }
+
+      initializeCategoryEvents() {
+        // Обработчики для всех ссылок категорий и подкатегорий
+        const categoryLinks = document.querySelectorAll('.category-link, .subcategory-link');
+
+        categoryLinks.forEach(link => {
+          link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const categoryName = link.getAttribute('data-category');
+            this.selectCategory(categoryName, link.textContent.trim());
+          });
+        });
+      }
+
+      selectCategory(categoryId, categoryName) {
+        this.currentCategory = categoryId;
+
+        // Подсветка выбранной категории
+        document.querySelectorAll('.category-link, .subcategory-link').forEach(link => {
+          link.style.background = '';
+          link.style.color = link.classList.contains('category-link') ? '#333' : '#333';
+        });
+
+        // Находим и выделяем выбранную категорию
+        const selectedLink = document.querySelector(`[data-category="${categoryId}"]`);
+        if (selectedLink) {
+          selectedLink.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+          selectedLink.style.color = 'white';
+        }
+
+        // Отправляем запрос на сервер
+        this.sendCategoryChangeRequest(categoryId, categoryName);
+      }
+
+      async sendCategoryChangeRequest(categoryId, categoryName) {
+        try {
+          const csrfToken = this.getCSRFToken();
+
+          const response = await fetch('/api/home/', { // Замените на ваш URL
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({
+              action: 'change_category',
+              category_id: categoryId,
+              category_name: categoryName
+            })
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const data = await response.json();
+
+          // Обработка ответа от сервера
+          if (data.message) {
+            this.showNotification(data.message);
+          }
+
+          // Обновление счетчика корзины если пришел
+          if (data.cart_count !== undefined) {
+            window.refreshCartCounter(data.cart_count);
+          }
+
+          // Можно обновить список товаров на странице
+          this.updateProductsList(data);
+
+        } catch (error) {
+          console.error('Ошибка при смене категории:', error);
+          this.showNotification('Ошибка при загрузке категории', 'error');
+        }
+      }
+
+      getCSRFToken() {
+        const cookieValue = document.cookie
+          .split('; ')
+          .find(row => row.startsWith('csrftoken='))
+          ?.split('=')[1];
+        return cookieValue || '';
+      }
+
+      showNotification(message, type = 'success') {
+        // Создаем уведомление
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.innerHTML = `
+          <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+          <span>${message}</span>
+        `;
+
+        // Стили для уведомления
+        notification.style.cssText = `
+          position: fixed;
+          top: 100px;
+          right: 20px;
+          background: ${type === 'success' ? '#4cd964' : '#ff4757'};
+          color: white;
+          padding: 15px 20px;
+          border-radius: 10px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+          z-index: 2000;
+          animation: slideIn 0.3s ease;
+        `;
+
+        document.body.appendChild(notification);
+
+        // Удаляем уведомление через 3 секунды
+        setTimeout(() => {
+          notification.style.animation = 'slideOut 0.3s ease';
+          setTimeout(() => notification.remove(), 300);
+        }, 3000);
+      }
+
+      updateProductsList(data) {
+        // Здесь можно обновить список товаров на странице
+        // В зависимости от того, как у вас организован вывод товаров
+
+        // Например, если у вас есть контейнер с товарами:
+        const productsContainer = document.getElementById('products-container');
+        if (productsContainer && data.products) {
+          // Обновляем товары
+          // productsContainer.innerHTML = this.renderProducts(data.products);
+        }
+
+        // Или можно просто перезагрузить страницу
+        // window.location.reload();
+      }
+    }
+
+    // Добавляем стили для анимации уведомлений
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes slideIn {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideOut {
+        from {
+          transform: translateX(0);
+          opacity: 1;
+        }
+        to {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+
     // Инициализация при загрузке страницы
     document.addEventListener('DOMContentLoaded', () => {
       window.cartCounterManager = new CartCounterManager();
+      window.categoryManager = new CategoryManager();
     });
 
     // Простая функция для обновления извне
@@ -366,6 +769,57 @@
       });
       document.dispatchEvent(event);
     };
+
+    // Функция для загрузки категорий с сервера
+    async function loadCategoriesFromServer() {
+      try {
+        // Пример загрузки реальных категорий с сервера
+        const response = await fetch('/api/categories/');
+        const categories = await response.json();
+
+        // Отрисовка категорий
+        renderCategories(categories);
+      } catch (error) {
+        console.error('Ошибка загрузки категорий:', error);
+      }
+    }
+
+    function renderCategories(categories) {
+      const dropdown = document.getElementById('categoriesDropdown');
+      if (!dropdown) return;
+
+      let html = '';
+
+      categories.forEach(category => {
+        html += `
+          <div class="category-item">
+            <a href="#" class="category-link" data-category="${category.id}">
+              ${category.name}
+              ${category.children && category.children.length > 0 ? '<i class="fas fa-chevron-right"></i>' : ''}
+            </a>
+            ${category.children && category.children.length > 0 ? `
+              <div class="subcategories">
+                ${category.children.map(child => `
+                  <a href="#" class="subcategory-link" data-category="${child.id}">
+                    ${child.name}
+                  </a>
+                `).join('')}
+              </div>
+            ` : ''}
+          </div>
+        `;
+      });
+
+      dropdown.innerHTML = html;
+
+      // Переинициализируем обработчики событий
+      if (window.categoryManager) {
+        window.categoryManager.initializeCategoryEvents();
+      }
+    }
+
+    // Загружаем категории с сервера при загрузке
+    // loadCategoriesFromServer();
 
   </script>
 </body>

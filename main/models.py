@@ -11,6 +11,20 @@ class Account(models.Model):
         return self.username
 
 
+class Category(models.Model):
+    name = models.CharField(max_length=100)
+    parent = models.ForeignKey(
+        'self',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='childrem'
+    )
+
+    def __str__(self):
+        return self.name
+
+
 class Product(models.Model):
     title = models.CharField(max_length=200)
     price = models.IntegerField()
@@ -18,6 +32,17 @@ class Product(models.Model):
     product_id = models.IntegerField(null=True, blank=True)
     wishlist = models.BooleanField(default=False)
     description = models.TextField(default='', max_length=2000)
+    default_category, _ = Category.objects.get_or_create(
+        name="Без категории",
+        defaults={'parent': None}
+    )
+
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.SET_DEFAULT,  # Устанавливаем значение по умолчанию при удалении
+        default=default_category.id,  # ID дефолтной категории
+        related_name='products'
+    )
 
     def __str__(self):
         return self.title
@@ -74,3 +99,5 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Order #{self.id} - {self.user} - {self.total_amount} RUB"
+
+

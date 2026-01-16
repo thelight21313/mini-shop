@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.hashers import check_password
-from .models import Account, Product, Cart, Wishlist, Order
+from .models import Account, Product, Cart, Wishlist, Order, Category
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 from datetime import date
