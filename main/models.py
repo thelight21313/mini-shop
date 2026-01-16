@@ -32,10 +32,7 @@ class Product(models.Model):
     product_id = models.IntegerField(null=True, blank=True)
     wishlist = models.BooleanField(default=False)
     description = models.TextField(default='', max_length=2000)
-    default_category, _ = Category.objects.get_or_create(
-        name="Без категории",
-        defaults={'parent': None}
-    )
+    default_category, _ = ""
 
     category = models.ForeignKey(
         Category,
