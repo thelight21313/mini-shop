@@ -13,7 +13,15 @@ SECRET_KEY = 'django-insecure-qbkgnencqx1a(q)o3#^s!#71l#f8gd#r0swphy5+y5-mk*p6o*
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['nenado.duckdns.org', "www.nenado.duckdns.org", "158.160.38.214", "127.0.0.1"]
+ALLOWED_HOSTS = [
+    'nenado.duckdns.org',
+    "www.nenado.duckdns.org",
+    "158.160.38.214",
+    "127.0.0.1",
+    '0.0.0.0',
+    'django_app_1',
+    'nginx_1',
+]
 
 
 # Application definition
@@ -126,3 +134,4 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+
