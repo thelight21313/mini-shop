@@ -33,7 +33,7 @@ class Product(models.Model):
     wishlist = models.BooleanField(default=False)
     description = models.TextField(default='', max_length=2000)
     default_category, _ = Category.objects.get_or_create(
-        name="Без категории",
+        name="all",
         defaults={'parent': None}
     )
 

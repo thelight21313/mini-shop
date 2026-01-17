@@ -13,13 +13,14 @@ from yookassa import Configuration, Payment
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import CounterSerializer
+from .serializers import CounterSerializer, ProductserForUpdatePage
 from rest_framework.views import APIView
 import json
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
 from rest_framework.permissions import IsAuthenticated
+from django.db.models import Q
 
 
 def register(request):
@@ -36,6 +37,7 @@ def register(request):
 
 class homeAPIView(APIView):
     permission_classes = [IsAuthenticated]
+
     def post(self, request):
         message = ''
         action = request.data.get('action')
@@ -78,6 +80,28 @@ class homeAPIView(APIView):
                 wish.delete()
                 message = 'товар удалён из избранного'
                 is_favorite = False
+        elif action == "change_category":
+            category = request.data.get('category_name')
+            if category == "all":
+                products = Product.objects.all()
+            else:
+                products = Product.objects.filter(Q(category__name=category, category__parent=category))
+            wishlist_ids = list(
+                Wishlist.objects.filter(username=username).values_list('product_id', flat=True)
+            )
+            serializer = ProductserForUpdatePage(
+                products,
+                many=True,
+                context={"wishlist_ids": wishlist_ids}
+            )
+            cart_count = Cart.objects.filter
+            return Response({
+                'message': f'Выбрана категория: {category}',
+                'cart_count': cart_count,
+                'products': serializer.data,
+                'wishlist_product_ids': wishlist_ids
+            })
+
         cart_count = Cart.objects.filter(user=username).count()
         return Response({
             'message': message,
