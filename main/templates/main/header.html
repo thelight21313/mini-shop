@@ -663,7 +663,6 @@
     }
 
     // Система управления категориями
-    // Система управления категориями
     class CategoryManager {
       constructor() {
         this.currentCategory = null;
@@ -798,6 +797,20 @@
         }, 3000);
       }
     }
+
+    // Инициализация при загрузке страницы
+    document.addEventListener('DOMContentLoaded', () => {
+      window.cartCounterManager = new CartCounterManager();
+      window.categoryManager = new CategoryManager();
+    });
+
+    // Простая функция для обновления извне
+    window.refreshCartCounter = function(count) {
+      const event = new CustomEvent('cartCountUpdated', {
+        detail: { count: count }
+      });
+      document.dispatchEvent(event);
+    };
   </script>
 </body>
 </html>
