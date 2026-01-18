@@ -663,6 +663,7 @@
     }
 
     // Система управления категориями
+    // Система управления категориями
     class CategoryManager {
       constructor() {
         this.currentCategory = null;
@@ -696,6 +697,8 @@
         this.currentCategory = categoryName;
 
         try {
+          this.showNotification('Загрузка товаров...', 'info');
+
           const csrfToken = this.getCSRFToken();
 
           const response = await fetch('/api/', {
@@ -716,16 +719,25 @@
 
           const data = await response.json();
 
-          if (data.message) {
-            this.showNotification(data.message, 'success');
+          // КРИТИЧЕСКИ ВАЖНО: Обновляем список товаров на странице!
+          if (data.products && window.updateProductsGrid) {
+            window.updateProductsGrid(data.products, data.wishlist_product_ids || []);
+          } else if (data.products && !window.updateProductsGrid) {
+            console.warn('Функция updateProductsGrid не найдена. Перезагружаем страницу...');
+            window.location.reload();
           }
 
-          if (data.cart_count !== undefined) {
+          // Обновляем счетчик корзины
+          if (data.cart_count !== undefined && window.refreshCartCounter) {
             window.refreshCartCounter(data.cart_count);
           }
 
-          // Можно обновить список товаров или перезагрузить страницу
-          // window.location.reload();
+          // Показываем уведомление
+          if (data.message) {
+            this.showNotification(data.message, 'success');
+          } else {
+            this.showNotification(`Загружено товаров: ${data.products.length}`, 'success');
+          }
 
         } catch (error) {
           console.error('Ошибка при смене категории:', error);
@@ -742,10 +754,23 @@
       }
 
       showNotification(message, type = 'success') {
+        // Удаляем старое уведомление если есть
+        const oldNotification = document.querySelector('.category-notification');
+        if (oldNotification) {
+          oldNotification.remove();
+        }
+
         const notification = document.createElement('div');
-        notification.className = `notification ${type}`;
+        notification.className = `category-notification notification ${type}`;
+
+        const iconMap = {
+          'success': 'check-circle',
+          'error': 'exclamation-circle',
+          'info': 'info-circle'
+        };
+
         notification.innerHTML = `
-          <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+          <i class="fas fa-${iconMap[type] || 'info-circle'}"></i>
           <span>${message}</span>
         `;
 
@@ -753,7 +778,7 @@
           position: fixed;
           top: 100px;
           right: 20px;
-          background: ${type === 'success' ? '#4cd964' : '#ff4757'};
+          background: ${type === 'success' ? '#4cd964' : type === 'error' ? '#ff4757' : '#667eea'};
           color: white;
           padding: 15px 20px;
           border-radius: 10px;
@@ -773,20 +798,6 @@
         }, 3000);
       }
     }
-
-    // Инициализация при загрузке страницы
-    document.addEventListener('DOMContentLoaded', () => {
-      window.cartCounterManager = new CartCounterManager();
-      window.categoryManager = new CategoryManager();
-    });
-
-    // Простая функция для обновления извне
-    window.refreshCartCounter = function(count) {
-      const event = new CustomEvent('cartCountUpdated', {
-        detail: { count: count }
-      });
-      document.dispatchEvent(event);
-    };
   </script>
 </body>
 </html>
