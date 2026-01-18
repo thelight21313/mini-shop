@@ -25,8 +25,8 @@ class ProductSerializer(serializers.ModelSerializer):
 class ProductserForUpdatePage(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ['title', 'price', 'image_url', 'product_id', 'in_wishlist']
-        read_only_fields = ['in_wishlist']
+        fields = ['title', 'price', 'image_url', 'product_id']
+        extra_fields = ['in_wishlist']
     def get_in_wishlist(self, obj):
         wishlist_ids = self.context.get('wishlist_ids', [])
         return obj.product_id in wishlist_ids
