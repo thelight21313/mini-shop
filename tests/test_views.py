@@ -251,14 +251,15 @@ class Test_paymnet_system():
 
 @pytest.mark.django_db
 class Test_create_product():
-    def test(self, authenticated_client):
+    def test(self, authenticated_client, test_category):
         products = Product.objects.all()
         assert products.count() == 0
         data = {
             'title': "test",
             'price': 200,
             'image_url': 'test_url.com',
-            'description': "test description"
+            'description': "test description",
+            'final_category_id': test_category.id
         }
         client = authenticated_client
         response = client.post(reverse('create_product'), data, secure=True)
