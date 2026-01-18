@@ -3,7 +3,7 @@ import main.views as view
 from django.contrib.auth.models import User
 from django.test import TestCase, Client
 from django.urls import reverse
-from main.models import Product, Cart, Wishlist, Order
+from main.models import Product, Cart, Wishlist, Order, Category
 from unittest.mock import patch
 from unittest.mock import patch, MagicMock
 
@@ -16,16 +16,23 @@ def test_user(db):
             "password1": passw,
             "password2": passw}
 
+@pytest.fixture()
+def test_category(db):
+    return Category.objects.create(
+        id=2,
+        name="Test Category"
+    )
 
 @pytest.fixture()
-def test_product(db):
+def test_product(db, test_category):
     return Product.objects.create(
         product_id=1,
         title="test",
         price=100,
         image_url="",
         wishlist=False,
-        description=""
+        description="",
+        category=test_category
     )
 
 
