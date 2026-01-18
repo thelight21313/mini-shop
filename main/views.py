@@ -379,8 +379,8 @@ def create_product(request):
             category=category
         )
         return redirect('home')
-
-    return render(request, "main/create_product.html")
+    categories = Category.objects.all()
+    return render(request, "main/create_product.html", {'categories': categories})
 
 
 @login_required
