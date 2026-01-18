@@ -50,20 +50,39 @@
         }
 
         input[type="text"],
-        input[type="number"] {
+        input[type="number"],
+        select,
+        textarea {
             width: 100%;
             padding: 14px;
             border: 2px solid #e1e5e9;
             border-radius: 8px;
             font-size: 16px;
             transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
         }
 
         input[type="text"]:focus,
-        input[type="number"]:focus {
+        input[type="number"]:focus,
+        select:focus,
+        textarea:focus {
             border-color: #667eea;
             outline: none;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 40px;
         }
 
         .submit-btn {
@@ -130,6 +149,50 @@
             border: 2px dashed #ddd;
             padding: 10px;
         }
+
+        .category-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .category-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .category-group > div {
+            flex: 1;
+        }
+
+        .category-info {
+            background: #fff;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+            border-left: 3px solid #667eea;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .category-info i {
+            color: #667eea;
+            margin-right: 5px;
+        }
+
+        #subcategory_id {
+            display: none;
+        }
+
+        #subcategory_id.show {
+            display: block;
+        }
+
+        .required {
+            color: #dc3545;
+        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -146,14 +209,46 @@
             {% csrf_token %}
 
             <div class="form-group">
-                <label for="title"><i class="fas fa-heading"></i> Название товара</label>
+                <label for="title"><i class="fas fa-heading"></i> Название товара <span class="required">*</span></label>
                 <input type="text" id="title" name="title" required
                        placeholder="Например: iPhone 15 Pro Max">
                 <div class="field-info">Максимум 200 символов</div>
             </div>
 
+            <div class="category-section">
+                <h3 style="margin-bottom: 15px; color: #333; font-size: 18px;">
+                    <i class="fas fa-layer-group"></i> Категория товара <span class="required">*</span>
+                </h3>
+
+                <div class="category-group">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="category_id">Основная категория</label>
+                        <select id="category_id" name="category_id" required>
+                            <option value="">Выберите категорию</option>
+                            {% for category in categories %}
+                                {% if not category.parent %}
+                                <option value="{{ category.id }}">{{ category.name }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="subcategory_id">Подкатегория (если есть)</label>
+                        <select id="subcategory_id" name="subcategory_id">
+                            <option value="">Сначала выберите категорию</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="category-info">
+                    <i class="fas fa-info-circle"></i>
+                    <span id="category_help">Выберите основную категорию. Если есть подкатегории, они появятся автоматически.</span>
+                </div>
+            </div>
+
             <div class="form-group">
-                <label for="price"><i class="fas fa-tag"></i> Цена (в рублях)</label>
+                <label for="price"><i class="fas fa-tag"></i> Цена (в рублях) <span class="required">*</span></label>
                 <input type="number" id="price" name="price" required
                        min="1" max="1000000"
                        placeholder="Например: 99999">
@@ -161,14 +256,14 @@
             </div>
 
             <div class="form-group">
-                <label for="description"><i class="fas fa-heading"></i> Описание товара</label>
-                <input type="text" id="description" name="description" required
-                       placeholder="Введите описание товара">
+                <label for="description"><i class="fas fa-align-left"></i> Описание товара <span class="required">*</span></label>
+                <textarea id="description" name="description" required
+                          placeholder="Введите подробное описание товара"></textarea>
                 <div class="field-info">Максимум 2000 символов</div>
             </div>
 
             <div class="form-group">
-                <label for="image_url"><i class="fas fa-image"></i> Ссылка на изображение</label>
+                <label for="image_url"><i class="fas fa-image"></i> Ссылка на изображение <span class="required">*</span></label>
                 <input type="text" id="image_url" name="image_url" required
                        placeholder="https://example.com/image.jpg">
                 <div class="field-info">Поддерживается JPG, PNG, WebP</div>
@@ -192,6 +287,52 @@
     </div>
 
     <script>
+        // Данные категорий с сервера
+        const categories = [
+            {% for category in categories %}
+            {
+                id: {{ category.id }},
+                name: "{{ category.name }}",
+                parent_id: {{ category.parent.id|default:"null" }}
+            }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ];
+
+        // Обработка выбора основной категории
+        document.getElementById('category_id').addEventListener('change', function() {
+            const categoryId = parseInt(this.value);
+            const subcategorySelect = document.getElementById('subcategory_id');
+            const categoryHelp = document.getElementById('category_help');
+
+            // Очищаем подкатегории
+            subcategorySelect.innerHTML = '<option value="">Нет подкатегорий</option>';
+
+            if (categoryId) {
+                // Находим подкатегории для выбранной категории
+                const subcategories = categories.filter(cat => cat.parent_id === categoryId);
+
+                if (subcategories.length > 0) {
+                    // Если есть подкатегории, показываем их
+                    subcategorySelect.innerHTML = '<option value="">Выберите подкатегорию (опционально)</option>';
+                    subcategories.forEach(sub => {
+                        const option = document.createElement('option');
+                        option.value = sub.id;
+                        option.textContent = sub.name;
+                        subcategorySelect.appendChild(option);
+                    });
+                    subcategorySelect.classList.add('show');
+                    categoryHelp.innerHTML = `<i class="fas fa-check-circle"></i> Выбрана категория: <strong>${this.options[this.selectedIndex].text}</strong>. Можете выбрать подкатегорию.`;
+                } else {
+                    // Нет подкатегорий
+                    subcategorySelect.classList.remove('show');
+                    categoryHelp.innerHTML = `<i class="fas fa-check-circle"></i> Выбрана категория: <strong>${this.options[this.selectedIndex].text}</strong>. Подкатегорий нет.`;
+                }
+            } else {
+                subcategorySelect.classList.remove('show');
+                categoryHelp.innerHTML = '<i class="fas fa-info-circle"></i> Выберите основную категорию. Если есть подкатегории, они появятся автоматически.';
+            }
+        });
+
         // Превью изображения в реальном времени
         document.getElementById('image_url').addEventListener('input', function() {
             const url = this.value.trim();
@@ -202,9 +343,23 @@
                 preview.src = url;
                 preview.style.display = 'block';
                 noPreview.style.display = 'none';
+
+                // Обработка ошибки загрузки изображения
+                preview.onerror = function() {
+                    this.style.display = 'none';
+                    noPreview.textContent = '⚠️ Не удалось загрузить изображение по этой ссылке';
+                    noPreview.style.color = '#dc3545';
+                    noPreview.style.display = 'block';
+                };
+
+                preview.onload = function() {
+                    noPreview.style.display = 'none';
+                };
             } else {
                 preview.style.display = 'none';
                 noPreview.style.display = 'block';
+                noPreview.textContent = 'Превью появится после ввода ссылки';
+                noPreview.style.color = '#999';
             }
         });
 
@@ -213,6 +368,37 @@
             let url = this.value.trim();
             if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
                 this.value = 'https://' + url;
+                // Триггерим событие input для обновления превью
+                this.dispatchEvent(new Event('input'));
+            }
+        });
+
+        // Валидация формы перед отправкой
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const categoryId = document.getElementById('category_id').value;
+            const subcategoryId = document.getElementById('subcategory_id').value;
+
+            if (!categoryId) {
+                e.preventDefault();
+                alert('Пожалуйста, выберите категорию товара!');
+                document.getElementById('category_id').focus();
+                return false;
+            }
+
+            // Если выбрана подкатегория, используем её вместо основной
+            if (subcategoryId) {
+                // Создаем скрытое поле для отправки правильной категории
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'final_category_id';
+                hiddenInput.value = subcategoryId;
+                this.appendChild(hiddenInput);
+            } else {
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'final_category_id';
+                hiddenInput.value = categoryId;
+                this.appendChild(hiddenInput);
             }
         });
     </script>

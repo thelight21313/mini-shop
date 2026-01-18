@@ -368,13 +368,15 @@ def create_product(request):
             new_product_id = last_product.product_id + 1
         else:
             new_product_id = 1
-
+        final_category_id = request.POST.get('final_category_id')
+        category = Category.objects.get(id=final_category_id)
         Product.objects.create(
             title=title,
             price=price,
             image_url=image_url,
             product_id=new_product_id,
-            description = description
+            description=description,
+            category=category
         )
         return redirect('home')
 
