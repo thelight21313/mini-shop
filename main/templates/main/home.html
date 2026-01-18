@@ -483,9 +483,9 @@
                     <!-- Кнопка избранного поверх картинки -->
                     <button type="button"
                             onclick="event.stopPropagation(); handleAction({{ product.product_id }}, 'add_to_favorites')"
-                            class="btn-favorite-overlay favorite-btn-{{ product.product_id }}"
+                            class="btn-favorite-overlay favorite-btn-{{ product.product_id }} {% if product.product_id in wishlist_product_ids %}active{% endif %}"
                             title="Добавить в избранное">
-                        <i class="far fa-heart"></i>
+                        <i class="{% if product.product_id in wishlist_product_ids %}fas{% else %}far{% endif %} fa-heart"></i>
                     </button>
 
                     <!-- Оверлей подсказки -->
