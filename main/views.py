@@ -43,6 +43,7 @@ class homeAPIView(APIView):
         action = request.data.get('action')
         username = request.user.username
         is_favorite = False
+        cart_count = Cart.objects.filter(user=username).count()
         if action == "add_to_cart":
             _id = request.data.get('product_id')
             info = Product.objects.get(product_id=int(_id))
@@ -94,7 +95,6 @@ class homeAPIView(APIView):
                 many=True,
                 context={"wishlist_ids": wishlist_ids}
             )
-            cart_count = Cart.objects.filter
             return Response({
                 'message': f'Выбрана категория: {category}',
                 'cart_count': cart_count,
@@ -102,7 +102,7 @@ class homeAPIView(APIView):
                 'wishlist_product_ids': wishlist_ids
             })
 
-        cart_count = Cart.objects.filter(user=username).count()
+
         return Response({
             'message': message,
             'is_favorite': is_favorite,
