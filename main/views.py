@@ -86,7 +86,7 @@ class homeAPIView(APIView):
             if category == "all":
                 products = Product.objects.all()
             else:
-                products = Product.objects.filter(Q(category__name=category, category__parent__name=category))
+                products = Product.objects.filter(Q(category__name=category) | Q(category__parent__name=category))
             wishlist_ids = list(
                 Wishlist.objects.filter(username=username).values_list('product_id', flat=True)
             )
