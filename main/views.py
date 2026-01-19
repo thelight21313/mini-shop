@@ -147,10 +147,11 @@ class CartAPIView(APIView):
         product_id = request.data.get('product_id')
         action = request.data.get('action')
 
-        cart_item = get_object_or_404(Cart, product_id=product_id, user=username)
+        cart_item = Cart.objects.get(product_id=product_id, user=username)
 
         if action == 'plus':
-            cart_item.increase_quantity()
+            cart_item.count += 1
+            cart_item.save()
         elif action == 'minus':
             if cart_item.count > 1:
                 cart_item.count -= 1
