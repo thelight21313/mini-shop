@@ -1,8 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.hashers import check_password
-from .models import Account, Product, Cart, Wishlist, Order, Category
-from argon2 import PasswordHasher
-from argon2.exceptions import VerifyMismatchError
+from .models import Product, Cart, Wishlist, Order, Category
 from datetime import date
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, logout
@@ -149,11 +147,10 @@ class CartAPIView(APIView):
         product_id = request.data.get('product_id')
         action = request.data.get('action')
 
-        cart_item = Cart.objects.get(product_id=product_id, user=username)
+        cart_item = get_object_or_404(Cart, product_id=product_id, user=username)
 
         if action == 'plus':
-            cart_item.count += 1
-            cart_item.save()
+            cart_item.increase_quantity()
         elif action == 'minus':
             if cart_item.count > 1:
                 cart_item.count -= 1

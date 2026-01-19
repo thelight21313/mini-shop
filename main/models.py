@@ -2,14 +2,6 @@ from django.db import models
 from django.contrib.auth.models import User
 import json
 
-class Account(models.Model):
-    username = models.CharField(max_length=100, unique=True)
-    password_hash = models.CharField(max_length=255)  # твой хэш
-    date_joined = models.DateTimeField(max_length=300)
-
-    def __str__(self):
-        return self.username
-
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
@@ -65,6 +57,10 @@ class Cart(models.Model):
         self.item_total = self.price * self.count
         super().save(*args, **kwargs)
 
+    def increase_quantiry(self, amount=1):
+        self.count += amount
+        self.save()
+        return self
 
 class Wishlist(models.Model):
     username = models.CharField(max_length=200)
