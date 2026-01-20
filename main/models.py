@@ -31,7 +31,6 @@ class Product(models.Model):
 
     category = models.ForeignKey(
         Category,
-        on_delete=models.SET_DEFAULT,  # Устанавливаем значение по умолчанию при удалении
 #        default=default_category.id,  # ID дефолтной категории
         blank=True,
         null=True,
