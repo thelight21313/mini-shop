@@ -24,18 +24,15 @@ class Product(models.Model):
     product_id = models.IntegerField(null=True, blank=True)
     wishlist = models.BooleanField(default=False)
     description = models.TextField(default='', max_length=2000)
-#    default_category, _ = Category.objects.get_or_create(
-#        name="all",
-#        defaults={'parent': None}
-#    )
+    default_category, _ = Category.objects.get_or_create(
+        name="all",
+        defaults={'parent': None}
+    )
 
     category = models.ForeignKey(
         Category,
-        default=1,
-        on_delete=models.SET_DEFAULT,# Устанавливаем значение по умолчанию при удалении
-#        default=default_category.id,  # ID дефолтной категории
-        blank=True,
-        null=True,
+        on_delete=models.SET_DEFAULT,  # Устанавливаем значение по умолчанию при удалении
+        default=default_category.id,  # ID дефолтной категории
         related_name='products'
     )
 
