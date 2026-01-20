@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.hashers import check_password
-from .models import Product, Cart1, Wishlist1, Order1, Category
+from .models import Product, Cart, Wishlist, Order, Category
 from datetime import date
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, logout
@@ -40,7 +40,7 @@ class homeAPIView(APIView):
         action = request.data.get('action')
         user = request.user
         is_favorite = False
-        cart_count = Cart.count_for_user(user)
+        cart_count = Cart.count_for_user()
         if action == "add_to_cart":
             _id = request.data.get('product_id')
             info = Product.objects.get(product_id=int(_id))

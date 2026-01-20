@@ -4,7 +4,7 @@ from datetime import datetime
 from pathlib import Path
 from rest_framework import serializers
 from rest_framework.renderers import JSONRenderer
-from .models import Cart1, Product
+from .models import Cart, Product
 
 
 class CounterSerializer(serializers.ModelSerializer):
