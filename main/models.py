@@ -40,7 +40,7 @@ class Product(models.Model):
         return self.title
 
 
-class Cart(models.Model):
+class Cart1(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     price = models.IntegerField()
@@ -71,7 +71,7 @@ class Cart(models.Model):
     def count_for_user(self, user):
         return self.objects.filter(user=user).count()
 
-class Wishlist(models.Model):
+class Wishlist1(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     price = models.IntegerField()
@@ -82,7 +82,7 @@ class Wishlist(models.Model):
         return self.title
 
 
-class Order(models.Model):
+class Order1(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Ожидает оплаты'),
         ('pending_capture', 'Ожидает подтверждения'),
