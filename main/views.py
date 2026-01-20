@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.hashers import check_password
-from .models import Product, Cart, Wishlist, Order, Category
+from .models import Product, Cart1, Wishlist1, Order1, Category
 from datetime import date
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, logout
