@@ -3,7 +3,7 @@ import main.views as view
 from django.contrib.auth.models import User
 from django.test import TestCase, Client
 from django.urls import reverse
-from main.models import Product, Cart, Wishlist, Order, Category
+from main.models import Product, Cart1, Wishlist1, Order1, Category
 from unittest.mock import patch
 from unittest.mock import patch, MagicMock
 
