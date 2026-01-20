@@ -10,12 +10,10 @@ from unittest.mock import patch, MagicMock
 
 @pytest.fixture()
 def test_user(db):
-    name = "test_user"
-    passw = "ComplexPass123"
-    return {"username": name,
-            "password1": passw,
-            "password2": passw}
-
+    return User.objects.create_user(
+        username='test_user',
+        password='ComplexPass123'
+    )
 @pytest.fixture()
 def test_category(db):
     return Category.objects.create(
@@ -38,7 +36,7 @@ def test_product(db, test_category):
 
 @pytest.fixture()
 def authenticated_client(test_user):
-    user = User.objects.create_user(username=test_user['username'], password=test_user['password1'])
+    user = test_user
     client = Client()
     client.force_login(user)
     return client
@@ -51,7 +49,7 @@ def test_cart_object(test_product, test_user):
                 title=test_product.title,
                 price=test_product.price,
                 image_url=test_product.image_url,
-                user=test_user['username'],
+                user=test_user,
                 count=2,
                 item_total=test_product.price * 2
 
@@ -59,9 +57,9 @@ def test_cart_object(test_product, test_user):
 
 
 @pytest.fixture
-def test_order(db, test_product):
+def test_order(db, test_product, test_user):
     return Order.objects.create(
-            user='test_user',
+            user=test_user,
             total_amount=200,
             status='completes',
             payment_id='test_payment_123',
@@ -75,14 +73,13 @@ def test_order(db, test_product):
 
 
 class TestRegistration():
-    def test_register_creates_new_user(self, test_user):
-        name = test_user['username']
+    def test_register_creates_new_user(self, db):
         client = Client()
-        response = client.post('/register/', test_user, secure=True)
+        response = client.post('/register/', {"username": "test_user", "password1": "12345ASsddf", "password2": "12345ASsddf"}, secure=True)
         assert response.status_code == 302
         assert response.url == reverse('login')
-        assert User.objects.filter(username=name).exists()
-        assert User.objects.filter(username=name).count() == 1
+        assert User.objects.filter(username="test_user").exists()
+        assert User.objects.filter(username="test_user").count() == 1
 
 
 class TestHomeApi():
@@ -124,7 +121,7 @@ class TestHomeApi():
 
 class Test_home_view():
     def test_delete_cart(self, test_user, test_product, test_cart_object, test_order, authenticated_client):
-        assert Cart.objects.filter(user=test_user['username']).count() == 1
+        assert Cart.objects.filter(user=test_user).count() == 1
         client = authenticated_client
         test_order.status = 'completed'
         test_order.save()
@@ -133,10 +130,10 @@ class Test_home_view():
             {'payment_success': 'true', 'order_id': test_order.id},
             secure=True
         )
-        assert Cart.objects.filter(user=test_user['username']).count() == 0
+        assert Cart.objects.filter(user=test_user).count() == 0
 
     def test_not_delete_with_wrong_status_code(self, test_user, test_product, test_cart_object, test_order, authenticated_client):
-        assert Cart.objects.filter(user=test_user['username']).count() == 1
+        assert Cart.objects.filter(user=test_user).count() == 1
         client = authenticated_client
         test_order.status = 'pending'
         test_order.save()
@@ -145,10 +142,10 @@ class Test_home_view():
             {'payment_success': 'true', 'order_id': test_order.id},
             secure=True
         )
-        assert Cart.objects.filter(user=test_user['username']).count() == 1
+        assert Cart.objects.filter(user=test_user).count() == 1
 
     def test_wrong_order_id(self, test_user, test_product, test_cart_object, test_order, authenticated_client):
-        assert Cart.objects.filter(user=test_user['username']).count() == 1
+        assert Cart.objects.filter(user=test_user).count() == 1
         client = authenticated_client
         test_order.status = 'completed'
         test_order.save()
@@ -157,13 +154,13 @@ class Test_home_view():
             {'payment_success': 'true', 'order_id': -9999999},
             secure=True
         )
-        assert Cart.objects.filter(user=test_user['username']).count() == 1
+        assert Cart.objects.filter(user=test_user).count() == 1
         assert response.status_code == 200
 
 
 class Test_CartAPI():
     def test_actions(self, test_user, test_product, test_cart_object, test_order, authenticated_client):
-        assert Cart.objects.filter(user=test_user['username']).count() == 1
+        assert Cart.objects.filter(user=test_user).count() == 1
         data = {
             'action': 'plus',
             'product_id': test_product.product_id,
@@ -171,9 +168,9 @@ class Test_CartAPI():
         }
         client = authenticated_client
         response = client.post(reverse('cart_api'), data, secure=True)
-        cart_item = Cart.objects.get(user=test_user['username'], product_id=test_product.product_id)
+        cart_item = Cart.objects.get(user=test_user, product_id=test_product.product_id)
 
-        assert Cart.objects.filter(user=test_user['username'], product_id=test_product.product_id).exists()
+        assert Cart.objects.filter(user=test_user, product_id=test_product.product_id).exists()
         assert cart_item.count == 3
         assert response.status_code == 200
         data['action'] = 'minus'
@@ -185,7 +182,7 @@ class Test_CartAPI():
         assert response.status_code == 200
         data['action'] = 'remove'
         response = client.post(reverse('cart_api'), data, secure=True)
-        assert not Cart.objects.filter(user=test_user['username'], product_id=test_product.product_id).exists()
+        assert not Cart.objects.filter(user=test_user, product_id=test_product.product_id).exists()
         assert response.status_code == 200
 
 
@@ -203,7 +200,7 @@ class Test_paymnet_system():
         assert response.status_code == 302
         assert response.url == "yookassa.ru"
 
-        orders = Order.objects.filter(user=test_user['username'])
+        orders = Order.objects.filter(user=test_user)
         assert orders.count() == 1
 
         order = orders.first()
@@ -218,13 +215,13 @@ class Test_paymnet_system():
 
     def test_webhook_payment_succeeded(self, client, test_user):
         order = Order.objects.create(
-            user=test_user['username'],
+            user=test_user,
             total_amount=200,
             status='pending',
             payment_id='pay_test_succeeded_id'
         )
-        Cart.objects.create(user=test_user['username'], title="Товар А", price=100, count=1, product_id=1)
-        Cart.objects.create(user=test_user['username'], title="Товар Б", price=100, count=1, product_id=2)
+        Cart.objects.create(user=test_user, title="Товар А", price=100, count=1, product_id=1)
+        Cart.objects.create(user=test_user, title="Товар Б", price=100, count=1, product_id=2)
 
         payload = {
             "event": "payment.succeeded",
@@ -246,7 +243,7 @@ class Test_paymnet_system():
         assert order.status == 'completed'
 
         # Проверяем, что корзина пользователя пуста
-        assert Cart.objects.filter(user=test_user['username']).count() == 0
+        assert Cart.objects.filter(user=test_user).count() == 0
 
 
 @pytest.mark.django_db

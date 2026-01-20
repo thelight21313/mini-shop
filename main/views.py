@@ -29,7 +29,6 @@ def register(request):
             return redirect('login')
     else:
         form = UserCreationForm()
-
     return render(request, 'main/register.html', {'form': form})
 
 
@@ -39,24 +38,24 @@ class homeAPIView(APIView):
     def post(self, request):
         message = ''
         action = request.data.get('action')
-        username = request.user.username
+        user = request.user
         is_favorite = False
-        cart_count = Cart.objects.filter(user=username).count()
+        cart_count = Cart.count_for_user(user)
         if action == "add_to_cart":
             _id = request.data.get('product_id')
             info = Product.objects.get(product_id=int(_id))
-            if not Cart.objects.filter(product_id=_id, user=username).exists():
+            if not Cart.objects.filter(product_id=_id, user=user).exists():
                 new_product = Cart.objects.create(
                     title=info.title,
                     price=info.price,
                     image_url=info.image_url,
                     product_id=info.product_id,
                     count=1,
-                    user=username
+                    user=user
                 )
                 message = 'Товар добавлен в корзину'
             else:
-                cart_item = Cart.objects.get(product_id=_id, user=username)
+                cart_item = Cart.objects.get(product_id=_id, user=user)
                 cart_item.count += 1
                 cart_item.save()
                 message = 'количество товара в корзине увеличено'
@@ -64,14 +63,14 @@ class homeAPIView(APIView):
         elif action == "add_to_favorites":
             _id = request.data.get('product_id')
             info = Product.objects.get(product_id=int(_id))
-            wish = Wishlist.objects.filter(product_id=_id, username=username)
+            wish = Wishlist.objects.filter(product_id=_id, user=user)
             if not wish.exists():
                 new_wish= Wishlist.objects.create(
                     title=info.title,
                     price=info.price,
                     image_url=info.image_url,
                     product_id=info.product_id,
-                    username=username
+                    user=user
                 )
                 message = 'товар добавлен в избранное'
                 is_favorite = True
@@ -86,7 +85,7 @@ class homeAPIView(APIView):
             else:
                 products = Product.objects.filter(Q(category__name=category) | Q(category__parent__name=category))
             wishlist_ids = list(
-                Wishlist.objects.filter(username=username).values_list('product_id', flat=True)
+                Wishlist.objects.filter(user=user).values_list('product_id', flat=True)
             )
             serializer = ProductserForUpdatePage(
                 products,
@@ -100,7 +99,6 @@ class homeAPIView(APIView):
                 'wishlist_product_ids': wishlist_ids
             })
 
-
         return Response({
             'message': message,
             'is_favorite': is_favorite,
@@ -111,8 +109,8 @@ class homeAPIView(APIView):
 @login_required
 def home(request):
     message = ''
-    username = request.user.username
-    cart_count = Cart.objects.filter(user=username).count()
+    user = request.user
+    cart_count = Cart.objects.filter(user=user).count()
     products = Product.objects.all()
     is_seller = request.user.groups.filter(name='seller').exists()
     payment_success = request.GET.get('payment_success') == 'true'
@@ -121,13 +119,13 @@ def home(request):
     # Если нужно, очищаем корзину после успешной оплаты
     if payment_success and order_id:
         try:
-            order = Order.objects.get(id=order_id, user=request.user.username)
+            order = Order.objects.get(id=order_id, user=request.user)
             if order.status == 'completed':
                 # Очищаем корзину
-                Cart.objects.filter(user=request.user.username).delete()
+                Cart.objects.filter(user=request.user).delete()
         except Order.DoesNotExist:
             pass
-    cart_count = Cart.objects.filter(user=username).count()
+    cart_count = Cart.objects.filter(user=user).count()
     message = ''
     context = {
         "message": '',
@@ -144,11 +142,11 @@ class CartAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        username = request.user.username
+        user = request.user
         product_id = request.data.get('product_id')
         action = request.data.get('action')
 
-        cart_item = get_object_or_404(Cart, product_id=product_id, user=username)
+        cart_item = get_object_or_404(Cart, product_id=product_id, user=user)
 
         if action == 'plus':
             cart_item.increase_quantity()
@@ -156,7 +154,7 @@ class CartAPIView(APIView):
             cart_item.reduce_quantity()
         elif action == 'remove':
             cart_item.delete()
-        cart_items = Cart.objects.filter(user=username)
+        cart_items = Cart.objects.filter(user=user)
         for item in cart_items:
             item.total_price = item.price * item.count
         cart_total = sum([item.total_price for item in cart_items])
@@ -167,19 +165,19 @@ class CartAPIView(APIView):
             response_data = {'product_id': product_id, 'count': 0}
         response_data['cart_total'] = cart_total
         response_data['items_count'] = cart_items.count()
-        cart_count = Cart.objects.filter(user=username).count()
+        cart_count = Cart.objects.filter(user=user).count()
         response_data['cart_count'] = cart_count
         return Response(response_data, status=status.HTTP_200_OK)
 
 
 @login_required
 def cart(request):
-    username = request.user.username
-    cart_items = Cart.objects.filter(user=username)
+    user = request.user
+    cart_items = Cart.objects.filter(user=user)
     for item in cart_items:
         item.total_price = item.price * item.count
     cart_total = sum([item.total_price for item in cart_items])
-    cart_count = Cart.objects.filter(user=username).count()
+    cart_count = Cart.objects.filter(user=user).count()
     context = {
         "cart_count": cart_count,
         "cart_items": cart_items,
@@ -195,12 +193,12 @@ def create_payment(request):
     Configuration.account_id = "1231470"
     Configuration.secret_key = "test_IUe2Mi_ainNSY1reHVY9Gk6d9gTqGIKKUkEt2Ni8A7U"
 
-    username = request.user.username
-    cart_items = Cart.objects.filter(user=username)
+    user = request.user
+    cart_items = Cart.objects.filter(user=user)
     cart_total = sum(item.price * item.count for item in cart_items)
 
     order = Order.objects.create(
-        user=username,
+        user=user,
         total_amount=cart_total,
         status='pending',
         payment_id=None,  # заполним после создания платежа
@@ -228,10 +226,10 @@ def create_payment(request):
                 "return_url": return_url  # Полный URL с доменом
             },
             "capture": True,
-            "description": f"Оплата заказа #{order.id} пользователя {username}",
+            "description": f"Оплата заказа #{order.id} пользователя {user}",
             "metadata": {
                 "order_id": order.id,
-                "user": username
+                "user": user
             }
         }, idempotence_key)
         order.payment_id = payment.id
@@ -290,7 +288,7 @@ def product_detail(request, product_id):
     is_in_wishlist = False
 
     if request.user.is_authenticated:
-        if Wishlist.objects.filter(username=request.user.username, product_id=product_id).exists():
+        if Wishlist.objects.filter(user=request.user, product_id=product_id).exists():
             is_in_wishlist = True
     context = {
         'product': product,
@@ -308,18 +306,18 @@ def about(request):
 def profile(request):
     wishlist_count = 0
     cart_items_count = 0
-    username = request.user.username
+    user = request.user
     try:
-        items = Cart.objects.filter(user=username)
+        items = Cart.objects.filter(user=user)
         for item in items:
             cart_items_count += item.count
     except:
         pass
-    wishlist = Wishlist.objects.filter(username=username)
+    wishlist = Wishlist.objects.filter(username=user)
     for wish in wishlist:
         wishlist_count+=1
-    orders = Order.objects.filter(user=username).order_by('-created_at')
-    cart_count = Cart.objects.filter(user=username).count()
+    orders = Order.objects.filter(user=user).order_by('-created_at')
+    cart_count = Cart.objects.filter(user=user).count()
     total_spent = sum(order.total_amount for order in orders.filter(status='completed'))
     context = {"user": request.user,
                "cart_items_count": cart_items_count,
@@ -379,7 +377,7 @@ def create_product(request):
 
 @login_required
 def order_history(request):
-    orders = Order.objects.filter(user=request.user.username).order_by('-created_at')
+    orders = Order.objects.filter(user=request.user).order_by('-created_at')
 
     return render(request, 'main/order_history.html', {
         'orders': orders,
@@ -389,7 +387,7 @@ def order_history(request):
 
 @login_required
 def order_detail(request, order_id):
-    order = get_object_or_404(Order, id=order_id, user=request.user.username)
+    order = get_object_or_404(Order, id=order_id, user=request.user)
 
     return render(request, 'main/order_detail.html', {
         'order': order,

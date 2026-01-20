@@ -41,7 +41,7 @@ class Product(models.Model):
 
 
 class Cart(models.Model):
-    user = models.TextField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     price = models.IntegerField()
     image_url = models.CharField(max_length=500)
@@ -68,8 +68,11 @@ class Cart(models.Model):
         else:
             self.delete()
 
+    def count_for_user(self, user):
+        return self.objects.filter(user=user).count()
+
 class Wishlist(models.Model):
-    username = models.CharField(max_length=200)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     price = models.IntegerField()
     image_url = models.CharField(max_length=500)
@@ -88,7 +91,7 @@ class Order(models.Model):
         ('canceled', 'Отменен'),
     ]
 
-    user = models.CharField(max_length=100)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     total_amount = models.IntegerField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     payment_id = models.CharField(max_length=100, null=True, blank=True)
