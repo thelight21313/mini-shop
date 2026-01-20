@@ -152,13 +152,8 @@ class CartAPIView(APIView):
 
         if action == 'plus':
             cart_item.increase_quantity()
-            cart_item.save()
         elif action == 'minus':
-            if cart_item.count > 1:
-                cart_item.count -= 1
-                cart_item.save()
-            else:
-                cart_item.delete()
+            cart_item.reduce_quantity()
         elif action == 'remove':
             cart_item.delete()
         cart_items = Cart.objects.filter(user=username)

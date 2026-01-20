@@ -61,6 +61,12 @@ class Cart(models.Model):
         self.save()
         return self
 
+    def reduce_quantity(self, amount=1):
+        if self.count > amount:
+            self.count -= amount
+            self.save()
+        else:
+            self.delete()
 
 class Wishlist(models.Model):
     username = models.CharField(max_length=200)
