@@ -53,14 +53,14 @@ class Cart(models.Model):
         return self.title
 
     def save(self, *args, **kwargs):
-        # Автоматически пересчитываем перед сохранением в базу
         self.item_total = self.price * self.count
         super().save(*args, **kwargs)
 
-    def increase_quantiry(self, amount=1):
+    def increase_quantity(self, amount=1):
         self.count += amount
         self.save()
         return self
+
 
 class Wishlist(models.Model):
     username = models.CharField(max_length=200)
