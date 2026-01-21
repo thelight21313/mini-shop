@@ -313,7 +313,7 @@ def profile(request):
             cart_items_count += item.count
     except:
         pass
-    wishlist = Wishlist.objects.filter(username=user)
+    wishlist = Wishlist.objects.filter(user=user)
     for wish in wishlist:
         wishlist_count+=1
     orders = Order.objects.filter(user=user).order_by('-created_at')
