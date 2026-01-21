@@ -806,6 +806,54 @@
             //     });
             // });
         });
+
+        async function handleCategoryChange(categoryName) {
+            try {
+                showNotification('Загрузка товаров...', 'info');
+
+                const response = await fetch('/api/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCSRFToken()
+                    },
+                    body: JSON.stringify({
+                        action: 'change_category',
+                        category_name: categoryName
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+
+                    // КРИТИЧЕСКИ ВАЖНО: проверяем редирект
+                    if (data.redirect) {
+                        // Если нужен редирект - перенаправляем на главную
+                        window.location.href = data.redirect_url || '/';
+                        return; // Останавливаем дальнейшее выполнение
+                    }
+
+                    // Если редиректа нет - просто обновляем товары на текущей странице
+                    updateProductsGrid(data.products, data.wishlist_product_ids || []);
+
+                    // Обновляем счетчик корзины
+                    if (window.updateCartCounter && data.cart_count !== undefined) {
+                        window.updateCartCounter(data.cart_count);
+                    }
+
+                    showNotification(data.message || `Загружено товаров: ${data.products.length}`, 'success');
+                } else {
+                    const error = await response.json();
+                    showNotification(error.detail || 'Ошибка загрузки товаров', 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                showNotification('Ошибка соединения с сервером', 'error');
+            }
+        }
+
+        // Делаем функцию доступной глобально
+        window.handleCategoryChange = handleCategoryChange;
     </script>
 </body>
 </html>
