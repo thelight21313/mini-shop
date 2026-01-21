@@ -103,7 +103,7 @@ class homeAPIView(APIView):
                 if path != '/':
                     return Response({
                         'redirect': True,
-                        'redirect_url': '/',
+                        'redirect_url': '',
                         'message': f'Выбрана категория: {category}',
                         'cart_count': cart_count,
                         'products': serializer.data,
