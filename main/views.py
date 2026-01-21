@@ -19,6 +19,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
+from urllib.parse import urlparse
 
 
 def register(request):
@@ -91,6 +92,25 @@ class homeAPIView(APIView):
                 many=True,
                 context={"wishlist_ids": wishlist_ids}
             )
+
+            referer = request.META.get('HTTP_REFERER')
+
+            if referer:
+                # Парсим URL
+                parsed_url = urlparse(referer)
+                path = parsed_url.path
+
+                # Проверяем, не главная ли это страница
+                if path != '/':
+                    return Response({
+                        'redirect': True,
+                        'redirect_url': '/',
+                        'message': f'Выбрана категория: {category}',
+                        'cart_count': cart_count,
+                        'products': serializer.data,
+                        'wishlist_product_ids': wishlist_ids
+
+                    }, status=status.HTTP_403_FORBIDDEN)
             return Response({
                 'message': f'Выбрана категория: {category}',
                 'cart_count': cart_count,
