@@ -40,7 +40,7 @@ class homeAPIView(APIView):
         action = request.data.get('action')
         user = request.user
         is_favorite = False
-        cart_count = Cart.count_for_user()
+        cart_count = Cart.count_for_user(user)
         if action == "add_to_cart":
             _id = request.data.get('product_id')
             info = Product.objects.get(product_id=int(_id))
