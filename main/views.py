@@ -96,7 +96,6 @@ class homeAPIView(APIView):
             referer = request.META.get('HTTP_REFERER')
 
             if referer:
-                # Парсим URL
                 parsed_url = urlparse(referer)
                 path = parsed_url.path
 
@@ -110,7 +109,7 @@ class homeAPIView(APIView):
                         'products': serializer.data,
                         'wishlist_product_ids': wishlist_ids
 
-                    }, status=status.HTTP_403_FORBIDDEN)
+                    })
             return Response({
                 'message': f'Выбрана категория: {category}',
                 'cart_count': cart_count,
