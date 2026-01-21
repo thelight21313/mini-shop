@@ -30,7 +30,6 @@
             margin: 0 auto;
         }
 
-        /* 6 карточек в строке на больших экранах */
         .products-grid {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
@@ -38,7 +37,6 @@
             margin-bottom: 40px;
         }
 
-        /* Компактная карточка товара */
         .product-card {
             background: white;
             border-radius: 12px;
@@ -75,7 +73,6 @@
             transform: scale(1.05);
         }
 
-        /* Кнопка избранного поверх картинки */
         .btn-favorite-overlay {
             position: absolute;
             top: 10px;
@@ -114,7 +111,6 @@
             color: #dc3545;
         }
 
-        /* Оверлей подсказки при наведении на картинку */
         .product-image-overlay {
             position: absolute;
             top: 0;
@@ -344,7 +340,6 @@
             font-size: 11px;
         }
 
-        /* Адаптивность */
         @media (max-width: 1200px) {
             .products-grid {
                 grid-template-columns: repeat(5, 1fr);
@@ -480,7 +475,6 @@
                 <div class="product-image-wrapper" onclick="goToProduct({{ product.product_id }})">
                     <img src="{{ product.image_url }}" alt="{{ product.title }}" class="product-image">
 
-                    <!-- Кнопка избранного поверх картинки -->
                     <button type="button"
                             onclick="event.stopPropagation(); handleAction({{ product.product_id }}, 'add_to_favorites')"
                             class="btn-favorite-overlay favorite-btn-{{ product.product_id }} {% if product.product_id in wishlist_product_ids %}active{% endif %}"
@@ -488,7 +482,6 @@
                         <i class="{% if product.product_id in wishlist_product_ids %}fas{% else %}far{% endif %} fa-heart"></i>
                     </button>
 
-                    <!-- Оверлей подсказки -->
                     <div class="product-image-overlay">
                         <span>
                             <i class="fas fa-search-plus"></i>
@@ -656,11 +649,6 @@
             }
         }
 
-        /**
-         * Обновляет список товаров на странице
-         * @param {Array} products - массив товаров от API
-         * @param {Array} wishlistIds - массив ID товаров в избранном
-         */
         function updateProductsGrid(products, wishlistIds = []) {
             const grid = document.querySelector('.products-grid');
 
@@ -669,10 +657,8 @@
                 return;
             }
 
-            // Очищаем текущий контент
             grid.innerHTML = '';
 
-            // Если товаров нет, показываем пустое состояние
             if (!products || products.length === 0) {
                 grid.innerHTML = `
                     <div class="empty-state">
@@ -686,7 +672,6 @@
                 return;
             }
 
-            // Создаём карточки для каждого товара
             products.forEach((product, index) => {
                 const isInWishlist = wishlistIds.includes(product.product_id);
 
@@ -734,50 +719,14 @@
             });
         }
 
-        /**
-         * Экранирование HTML для безопасности
-         */
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
 
-        /**
-         * Загружает товары по категории
-         * @param {number} categoryId - ID категории
-         */
-        async function loadProductsByCategory(categoryId) {
-            try {
-                showNotification('Загрузка товаров...', 'info');
-
-                const response = await fetch(`/api/products/?category=${categoryId}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': getCSRFToken()
-                    }
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-
-                    // Обновляем товары на странице
-                    updateProductsGrid(data.products, data.wishlist_ids || []);
-
-                    showNotification(`Загружено товаров: ${data.products.length}`, 'success');
-                } else {
-                    showNotification('Ошибка загрузки товаров', 'error');
-                }
-            } catch (error) {
-                console.error('Ошибка:', error);
-                showNotification('Ошибка соединения с сервером', 'error');
-            }
-        }
-
-        // Делаем функцию доступной глобально для использования в других местах
+        // Делаем функцию доступной глобально для header.html
         window.updateProductsGrid = updateProductsGrid;
-        window.loadProductsByCategory = loadProductsByCategory;
 
         document.addEventListener('DOMContentLoaded', function() {
             const cards = document.querySelectorAll('.product-card');
@@ -797,63 +746,7 @@
                     window.updateCartCounter(0);
                 }
             }
-
-            // Пример: если у вас есть кнопки категорий, привяжите к ним функцию
-            // document.querySelectorAll('.category-btn').forEach(btn => {
-            //     btn.addEventListener('click', () => {
-            //         const categoryId = btn.dataset.categoryId;
-            //         loadProductsByCategory(categoryId);
-            //     });
-            // });
         });
-
-        async function handleCategoryChange(categoryName) {
-            try {
-                showNotification('Загрузка товаров...', 'info');
-
-                const response = await fetch('/api/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': getCSRFToken()
-                    },
-                    body: JSON.stringify({
-                        action: 'change_category',
-                        category_name: categoryName
-                    })
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-
-                    // КРИТИЧЕСКИ ВАЖНО: проверяем редирект
-                    if (data.redirect) {
-                        // Если нужен редирект - перенаправляем на главную
-                        window.location.href = data.redirect_url || '/';
-                        return; // Останавливаем дальнейшее выполнение
-                    }
-
-                    // Если редиректа нет - просто обновляем товары на текущей странице
-                    updateProductsGrid(data.products, data.wishlist_product_ids || []);
-
-                    // Обновляем счетчик корзины
-                    if (window.updateCartCounter && data.cart_count !== undefined) {
-                        window.updateCartCounter(data.cart_count);
-                    }
-
-                    showNotification(data.message || `Загружено товаров: ${data.products.length}`, 'success');
-                } else {
-                    const error = await response.json();
-                    showNotification(error.detail || 'Ошибка загрузки товаров', 'error');
-                }
-            } catch (error) {
-                console.error('Ошибка:', error);
-                showNotification('Ошибка соединения с сервером', 'error');
-            }
-        }
-
-        // Делаем функцию доступной глобально
-        window.handleCategoryChange = handleCategoryChange;
     </script>
 </body>
 </html>

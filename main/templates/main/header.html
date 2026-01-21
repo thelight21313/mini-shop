@@ -35,7 +35,6 @@
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* Логотип как ссылка */
     .logo {
       display: flex;
       align-items: center;
@@ -100,7 +99,6 @@
       text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
 
-    /* Категории в центре */
     .categories-center {
       display: flex;
       align-items: center;
@@ -186,7 +184,6 @@
       transform: translateY(-3px) scale(1.05);
     }
 
-    /* Выпадающее меню подкатегорий */
     .subcategories-dropdown {
       position: absolute;
       top: calc(100% + 10px);
@@ -243,7 +240,6 @@
       border-bottom: none;
     }
 
-    /* Правая секция */
     .user-section {
       display: flex;
       align-items: center;
@@ -318,7 +314,6 @@
       transform: translateY(-3px) rotate(-2deg);
     }
 
-    /* Счётчик корзины */
     .cart-count {
       background: #ff4757;
       color: white;
@@ -351,7 +346,6 @@
       display: none !important;
     }
 
-    /* FOOTER */
     .footer {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       padding: 20px 40px;
@@ -387,12 +381,10 @@
       transform: translateY(-2px);
     }
 
-    /* Иконки */
     .fas, .far {
       font-size: 16px;
     }
 
-    /* Адаптивность */
     @media (max-width: 1024px) {
       .categories-center {
         gap: 15px;
@@ -442,7 +434,6 @@
       }
     }
 
-    /* Уведомления */
     @keyframes slideIn {
       from {
         transform: translateX(100%);
@@ -468,9 +459,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-  <!-- HEADER -->
   <nav class="navbar">
-    <!-- Логотип как ссылка -->
     <a href="{%url 'home'%}" class="logo">
       <div class="logo-icon">
         <i class="fas fa-store"></i>
@@ -478,9 +467,7 @@
       <span class="logo-text">MarketPlace</span>
     </a>
 
-    <!-- Категории в центре -->
     <div class="categories-center">
-      <!-- Кнопка ALL -->
       <div class="category-item">
         <button class="category-btn all-category" data-category="all">
           <i class="fas fa-th"></i>
@@ -488,7 +475,6 @@
         </button>
       </div>
 
-      <!-- Электроника -->
       <div class="category-item">
         <button class="category-btn" data-category="electronics">
           <i class="fas fa-laptop"></i>
@@ -507,7 +493,6 @@
         </div>
       </div>
 
-      <!-- Одежда -->
       <div class="category-item">
         <button class="category-btn" data-category="clothing">
           <i class="fas fa-tshirt"></i>
@@ -526,7 +511,6 @@
         </div>
       </div>
 
-      <!-- Книги -->
       <div class="category-item">
         <button class="category-btn" data-category="books">
           <i class="fas fa-book"></i>
@@ -545,7 +529,6 @@
         </div>
       </div>
 
-      <!-- Дом и Сад -->
       <div class="category-item">
         <button class="category-btn" data-category="home_garden">
           <i class="fas fa-home"></i>
@@ -565,7 +548,6 @@
       </div>
     </div>
 
-    <!-- Правая секция -->
     <div class="user-section">
       <a href="{%url 'cart'%}" class="nav-link" style="position: relative;">
         <i class="fas fa-shopping-cart"></i>
@@ -588,7 +570,6 @@
     </div>
   </nav>
 
-  <!-- FOOTER -->
   <footer class="footer">
     <div class="footer-content">
       <a href="{% url 'about'%}" class="footer-link">
@@ -611,7 +592,6 @@
   </footer>
 
   <script>
-    // Глобальная система обновления счетчика корзины
     class CartCounterManager {
       constructor() {
         this.counterElement = document.getElementById('cartCounter');
@@ -662,7 +642,6 @@
       }
     }
 
-    // Система управления категориями
     class CategoryManager {
       constructor() {
         this.currentCategory = null;
@@ -718,7 +697,13 @@
 
           const data = await response.json();
 
-          // КРИТИЧЕСКИ ВАЖНО: Обновляем список товаров на странице!
+          // КРИТИЧЕСКИ ВАЖНО: Проверяем редирект ПЕРВЫМ
+          if (data.redirect) {
+            window.location.href = data.redirect_url || '/';
+            return; // Останавливаем выполнение
+          }
+
+          // Если редиректа нет - обновляем товары на текущей странице
           if (data.products && window.updateProductsGrid) {
             window.updateProductsGrid(data.products, data.wishlist_product_ids || []);
           } else if (data.products && !window.updateProductsGrid) {
@@ -727,8 +712,8 @@
           }
 
           // Обновляем счетчик корзины
-          if (data.cart_count !== undefined && window.refreshCartCounter) {
-            window.refreshCartCounter(data.cart_count);
+          if (data.cart_count !== undefined && window.updateCartCounter) {
+            window.updateCartCounter(data.cart_count);
           }
 
           // Показываем уведомление
@@ -753,7 +738,6 @@
       }
 
       showNotification(message, type = 'success') {
-        // Удаляем старое уведомление если есть
         const oldNotification = document.querySelector('.category-notification');
         if (oldNotification) {
           oldNotification.remove();
@@ -798,13 +782,11 @@
       }
     }
 
-    // Инициализация при загрузке страницы
     document.addEventListener('DOMContentLoaded', () => {
       window.cartCounterManager = new CartCounterManager();
       window.categoryManager = new CategoryManager();
     });
 
-    // Простая функция для обновления извне
     window.refreshCartCounter = function(count) {
       const event = new CustomEvent('cartCountUpdated', {
         detail: { count: count }
