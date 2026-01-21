@@ -55,9 +55,8 @@ class homeAPIView(APIView):
                 )
                 message = 'Товар добавлен в корзину'
             else:
-                cart_item = Cart.objects.get(product_id=_id, user=user)
-                cart_item.count += 1
-                cart_item.save()
+                cart_item = get_object_or_404(Cart, product_id=_id, user=user)
+                cart_item.increase_quantity()
                 message = 'количество товара в корзине увеличено'
 
         elif action == "add_to_favorites":

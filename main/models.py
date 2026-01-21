@@ -68,8 +68,9 @@ class Cart(models.Model):
         else:
             self.delete()
 
-    def count_for_user(self, user):
-        return self.objects.filter(user=user).count()
+    @classmethod
+    def count_for_user(cls, user):
+        return cls.objects.filter(user=user).count()
 
 class Wishlist(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
