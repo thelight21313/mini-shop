@@ -460,12 +460,12 @@
 </head>
 <body>
   <nav class="navbar">
-    <a href="{%url 'home'%}" class="logo">
+    <button class="logo" id="logoButton" data-category="all">
       <div class="logo-icon">
         <i class="fas fa-store"></i>
       </div>
       <span class="logo-text">MarketPlace</span>
-    </a>
+    </button>
 
     <div class="categories-center">
       <div class="category-item">
@@ -651,7 +651,9 @@
       initializeCategoryEvents() {
         const categoryButtons = document.querySelectorAll('.category-btn');
         const subcategoryLinks = document.querySelectorAll('.subcategory-link');
+        const logoButton = document.getElementById('logoButton');
 
+        // Обработчик для кнопок категорий
         categoryButtons.forEach(btn => {
           btn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -661,6 +663,7 @@
           });
         });
 
+        // Обработчик для подкатегорий
         subcategoryLinks.forEach(link => {
           link.addEventListener('click', (e) => {
             e.preventDefault();
@@ -669,6 +672,16 @@
             this.selectCategory(categoryName);
           });
         });
+
+        // Обработчик для логотипа
+        if (logoButton) {
+          logoButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const categoryName = logoButton.getAttribute('data-category');
+            this.selectCategory(categoryName);
+          });
+        }
       }
 
       async selectCategory(categoryName) {
