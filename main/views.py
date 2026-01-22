@@ -160,6 +160,7 @@ def home(request):
         "is_seller": is_seller,
         "show_payment_success": payment_success,  # Флаг для JS
         "order_id": order_id if payment_success else None,
+        'wishlist_product_ids': wishlist_ids
     }
     return render(request, "main/home.html", context)
 
