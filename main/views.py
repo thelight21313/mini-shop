@@ -144,6 +144,9 @@ def home(request):
         except Order.DoesNotExist:
             pass
     cart_count = Cart.objects.filter(user=user).count()
+    wishlist_ids = list(
+        Wishlist.objects.filter(user=user).values_list('product_id', flat=True)
+    )
     message = ''
     context = {
         "message": '',
@@ -152,6 +155,7 @@ def home(request):
         "is_seller": is_seller,
         "show_payment_success": payment_success,  # Флаг для JS
         "order_id": order_id if payment_success else None,
+        "wishlist_ids": wishlist_ids
     }
     return render(request, "main/home.html", context)
 
