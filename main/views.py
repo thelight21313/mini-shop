@@ -147,15 +147,19 @@ def home(request):
     wishlist_ids = list(
         Wishlist.objects.filter(user=user).values_list('product_id', flat=True)
     )
+    serializer = ProductserForUpdatePage(
+        products,
+        many=True,
+        context={"wishlist_ids": wishlist_ids}
+    )
     message = ''
     context = {
         "message": '',
         'cart_count': cart_count,
-        "products": products,
+        "products": serializer.data,
         "is_seller": is_seller,
         "show_payment_success": payment_success,  # Флаг для JS
         "order_id": order_id if payment_success else None,
-        "wishlist_ids": wishlist_ids
     }
     return render(request, "main/home.html", context)
 
