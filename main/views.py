@@ -256,7 +256,7 @@ def create_payment(request):
             "description": f"Оплата заказа #{order.id} пользователя {user}",
             "metadata": {
                 "order_id": order.id,
-                "user": user
+                "user": user.id
             }
         }, idempotence_key)
         order.payment_id = payment.id
@@ -266,8 +266,6 @@ def create_payment(request):
     except Exception as e:
         order.status = "failed"
         order.save()
-        import traceback
-        print(traceback.format_exc())
         print(f"Ошибка создания платежа: {e}")
         return redirect('cart')
 
