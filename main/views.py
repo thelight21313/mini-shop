@@ -373,6 +373,9 @@ def contacts(request):
 
 @login_required
 def create_product(request):
+    user = request.user
+    if user.group != "seller":
+        return redirect('home')
     if request.method == "POST":
         new_product_id = 0
         title = request.POST.get("title")
