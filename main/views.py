@@ -373,7 +373,7 @@ def contacts(request):
 
 @login_required
 def create_product(request):
-    is_manager = request.user.groups.filter(name='Managers').exists()
+    is_manager = request.user.groups.filter(name='seller').exists()
     if not is_manager:
         return redirect('home')
     if request.method == "POST":
